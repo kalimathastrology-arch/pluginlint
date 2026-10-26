@@ -14,7 +14,7 @@ export const SITE_TAGLINE = 'Free, private tools for preparing a ChatGPT plugin 
 export const BEEHIIV_EMBED_URL = '';
 
 // TODO(google-form): paste the public Google Form URL for /submit. Empty = placeholder shown.
-export const GOOGLE_FORM_URL = '';
+export const GOOGLE_FORM_URL = 'https://forms.gle/h9FZE3tCoXm4fTJC8';
 
 // TODO(analytics): optional cookieless analytics script URL (e.g. a self-hosted/free tier cookieless tool).
 // Empty = no analytics loaded at all.
