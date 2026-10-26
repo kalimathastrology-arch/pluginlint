@@ -24,3 +24,9 @@ export const ANALYTICS_SCRIPT_URL = '';
 
 // TODO(adsense): AdSense publisher id (ca-pub-XXXXXXXXXXXXXXXX) once approved. Empty = no ads loaded.
 export const ADSENSE_CLIENT = '';
+
+// Paid human review on /review/. Paste the checkout links from your payment provider
+// (e.g. a Stripe Payment Link, Lemon Squeezy, Gumroad or PayPal checkout URL — must be https).
+// Empty = no Pay buttons; the page shows a "Request a review" button to GOOGLE_FORM_URL instead.
+export const REVIEW_PAYMENT_URL_STARTER = ''; // US$29 Starter
+export const REVIEW_PAYMENT_URL_FULL = ''; // US$79 Full

@@ -1,6 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import { GOOGLE_FORM_URL } from '../../site.config.mjs';
+import { u } from '../lib/url';
 ---
 <Base title="Submit Feedback or a Correction" description="Report a wrong or outdated ChatGPT plugin rule, suggest a new check, or share feedback about the PluginLint tools." crumbName="Submit feedback">
   <h1>Submit feedback or a correction</h1>
@@ -13,6 +14,7 @@ import { GOOGLE_FORM_URL } from '../../site.config.mjs';
     </div>
   )}
   <p>PluginLint itself does not collect anything on this page. The form, once linked, is hosted by Google.</p>
+  <p>Want a human check of your whole submission instead? See the <a href={u('/review/')}>plugin submission review</a>.</p>
   <h2>Helpful details to include</h2>
   <ul>
     <li>The rule or tool, and what you expected.</li>

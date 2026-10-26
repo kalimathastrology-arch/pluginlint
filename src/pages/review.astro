@@ -1,0 +1,86 @@
+---
+import Base from '../layouts/Base.astro';
+import Faq from '../components/Faq.astro';
+import { u } from '../lib/url';
+import { SITE_NAME, GOOGLE_FORM_URL, REVIEW_PAYMENT_URL_STARTER, REVIEW_PAYMENT_URL_FULL } from '../../site.config.mjs';
+import { REVIEW_TIERS, REVIEW_FAQS, REVIEW_TURNAROUND_HOURS, REVIEW_REFUND_HOURS } from '../lib/review';
+
+const payUrls: Record<string, string> = { starter: REVIEW_PAYMENT_URL_STARTER, full: REVIEW_PAYMENT_URL_FULL };
+const canPay = REVIEW_TIERS.every((t) => /^https:\/\//.test(payUrls[t.id] ?? ''));
+const home = new URL(u('/'), Astro.site).toString();
+const pageUrl = new URL(u('/review/'), Astro.site).toString();
+const description = 'Independent human review of your ChatGPT plugin submission against OpenAI’s public rules: a written report with likely rejection causes and concrete fixes.';
+const serviceLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Service',
+  name: 'ChatGPT plugin submission review',
+  serviceType: 'Pre-submission review of a ChatGPT plugin directory listing',
+  description,
+  url: pageUrl,
+  provider: { '@type': 'Organization', '@id': `${home}#org`, name: SITE_NAME, url: home },
+  areaServed: 'Worldwide',
+  offers: REVIEW_TIERS.map((t) => ({
+    '@type': 'Offer',
+    name: `${t.name} review`,
+    description: t.summary,
+    price: t.price.toFixed(2),
+    priceCurrency: 'USD',
+    url: canPay ? payUrls[t.id] : pageUrl,
+  })),
+};
+---
+<Base title="ChatGPT Plugin Submission Review (Human)" description="Human-checked review of your ChatGPT plugin submission against OpenAI’s public rules. Written report in 24 hours, US$29 or US$79. No approval guarantee." jsonLd={serviceLd} crumbName="Submission review">
+  <h1>Plugin submission review</h1>
+  <p class="lede">A person reads your ChatGPT plugin submission materials, checks each item against OpenAI’s published rules, and sends you a written report with likely rejection causes and concrete fixes.</p>
+  <p class="answer"><strong>In short:</strong> independent, human-checked, not affiliated with OpenAI, and no guarantee of approval. Report within {REVIEW_TURNAROUND_HOURS} hours; full refund if it isn’t delivered within {REVIEW_REFUND_HOURS} hours. Starter US$29, Full US$79. The free <a href={u('/grader/')}>grader</a> and <a href={u('/tools/')}>tools</a> stay free.</p>
+
+  <h2>What you send</h2>
+  <ul>
+    <li>Your listing fields: display name, short and long description, starter prompts, capabilities, category and URLs.</li>
+    <li>Your tool list (<code>tools/list</code> output) with each tool’s annotations.</li>
+    <li>Your five positive and three negative test cases and release notes.</li>
+    <li>The text of your privacy policy.</li>
+    <li>Screenshots, if your plugin has any.</li>
+    <li>Optionally, one link (for example your website, docs or demo recording).</li>
+  </ul>
+  <p>Please send sample tool output with fake or redacted values, never real user data or secrets. Your materials are used only to write your report and are not published.</p>
+
+  <h2>What you get back</h2>
+  <ul>
+    <li>A written report within {REVIEW_TURNAROUND_HOURS} hours of receiving your payment and materials.</li>
+    <li>Each item checked against OpenAI’s published rules, the same ones verified and sourced on the <a href={u('/rules/')}>rules page</a>.</li>
+    <li>A list of likely rejection causes, each with a concrete fix.</li>
+    <li>With the Full review: one free re-check after you apply the fixes.</li>
+  </ul>
+
+  <h2>Price</h2>
+  {REVIEW_TIERS.map((t) => (
+    <div class="card">
+      <h3 style="margin-top:0">{t.name} — US${t.price}</h3>
+      <p>{t.summary}</p>
+      <ul>{t.includes.map((i) => <li>{i}</li>)}</ul>
+      {canPay && <p><a class="btn" href={payUrls[t.id]} rel="noopener">Pay US${t.price} ({t.name})</a></p>}
+    </div>
+  ))}
+  {canPay ? (
+    <p>After paying, send your materials using the <a href={GOOGLE_FORM_URL} rel="noopener">request form (Google Forms)</a>. Payment is handled by the payment provider, not by this site.</p>
+  ) : (
+    <>
+      <p><a class="btn" href={GOOGLE_FORM_URL} rel="noopener">Request a review</a></p>
+      <p>Tell me what you need and I’ll reply with payment details. The form is hosted by Google; nothing is charged by submitting it.</p>
+    </>
+  )}
+
+  <h2>Please read before you buy</h2>
+  <ul>
+    <li><strong>Independent:</strong> PluginLint is not affiliated with, endorsed by, or sponsored by OpenAI.</li>
+    <li><strong>No guarantee of approval:</strong> only OpenAI’s reviewers decide. The report lowers the chance of avoidable mistakes; it cannot promise an outcome.</li>
+    <li><strong>Where the rules come from:</strong> OpenAI’s public developer documentation only, listed with sources on the <a href={u('/rules/')}>rules page</a>. No insider or non-public information.</li>
+    <li><strong>Who reviews:</strong> this is a one-person project; the same independent developer who runs PluginLint writes every report.</li>
+    <li><strong>Refund:</strong> if the report isn’t delivered within {REVIEW_REFUND_HOURS} hours of receiving your payment and materials, you get a full refund.</li>
+  </ul>
+
+  <Faq faqs={REVIEW_FAQS} />
+
+  <p>Prefer to do it yourself? The free <a href={u('/grader/')}>listing grader</a>, <a href={u('/tools/test-case-linter/')}>test-case linter</a> and <a href={u('/tools/tool-output-privacy-audit/')}>privacy auditor</a> cover most of the same checks in your browser. See also <a href={u('/privacy/')}>Privacy</a>.</p>
+</Base>

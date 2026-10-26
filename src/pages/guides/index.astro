@@ -11,5 +11,6 @@ const ld = {
   <h1>Guides</h1>
   <p class="lede">Short, sourced explanations of the ChatGPT plugin directory rules. Each guide starts with a one-paragraph answer, links to the OpenAI page it is based on, and shows when it was last checked.</p>
   {GUIDES.map((g) => <div class="card"><h2 style="margin-top:0"><a href={u(`/guides/${g.slug}/`)}>{g.title}</a></h2><p>{g.blurb}</p></div>)}
+  <p class="meta">Want a human check? See the optional paid <a href={u('/review/')}>plugin submission review</a>.</p>
   <p>Prefer to check your own listing? Use the <a href={u('/grader/')}>listing grader</a>, or see every limit on the <a href={u('/rules/')}>rules page</a>.</p>
 </Base>

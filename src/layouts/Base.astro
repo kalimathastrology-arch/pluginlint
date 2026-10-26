@@ -34,7 +34,7 @@ const ld = [
   ...(jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : []),
 ];
 const nav = [
-  ['/grader/', 'Grader'], ['/tools/', 'Tools'], ['/rules/', 'Rules'], ['/guides/', 'Guides'], ['/about/', 'About'],
+  ['/grader/', 'Grader'], ['/tools/', 'Tools'], ['/rules/', 'Rules'], ['/guides/', 'Guides'], ['/review/', 'Review'], ['/about/', 'About'],
 ];
 ---
 <!doctype html>
@@ -88,9 +88,9 @@ const nav = [
     </main>
     <footer class="site-footer">
       <div class="wrap">
-        <p><strong>PluginLint</strong> is an independent, free project. Not affiliated with, endorsed by, or sponsored by OpenAI. “ChatGPT” and “OpenAI” are trademarks of OpenAI.</p>
+        <p><strong>PluginLint</strong> is an independent project with free tools and an optional paid <a href={u('/review/')}>human review</a>. Not affiliated with, endorsed by, or sponsored by OpenAI. “ChatGPT” and “OpenAI” are trademarks of OpenAI.</p>
         <p>
-          <a href={u('/privacy/')}>Privacy</a> · <a href={u('/submit/')}>Submit feedback</a> ·
+          <a href={u('/privacy/')}>Privacy</a> · <a href={u('/submit/')}>Submit feedback</a> · <a href={u('/review/')}>Submission review</a> ·
           <a href={u('/rss.xml')}>RSS: rules changes</a> · <a href={u('/sitemap-index.xml')}>Sitemap</a> ·
           <a href={u('/llms.txt')}>llms.txt</a>
         </p>

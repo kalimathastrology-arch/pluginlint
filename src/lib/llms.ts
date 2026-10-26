@@ -2,6 +2,7 @@
 import { LIMITS, CATEGORIES, LAST_CHECKED, SOURCES, RULES_TABLE } from './rules-data';
 import { GUIDES } from './guides';
 import { FAQS } from './faqs';
+import { REVIEW_FAQS, REVIEW_TIERS, REVIEW_TURNAROUND_HOURS, REVIEW_REFUND_HOURS } from './review';
 
 const n = (x: number) => x.toLocaleString('en-US');
 
@@ -47,13 +48,14 @@ export function llmsTxt(abs: (path: string) => string, full = false): string {
     L.push('');
     L.push('## Frequently asked questions', '');
     const seen = new Set<string>();
-    for (const list of Object.values(FAQS)) for (const f of list) {
+    for (const list of [...Object.values(FAQS), REVIEW_FAQS]) for (const f of list) {
       if (seen.has(f.q)) continue; seen.add(f.q);
       L.push(`### ${f.q}`, '', f.a, '');
     }
   }
   L.push('## Optional', '');
   L.push(
+    `- [Plugin submission review](${abs('/review/')}): optional paid human review (Starter US$${REVIEW_TIERS[0].price}, Full US$${REVIEW_TIERS[1].price}); written report within ${REVIEW_TURNAROUND_HOURS} hours, refund if not delivered within ${REVIEW_REFUND_HOURS}; no approval guarantee; not affiliated with OpenAI.`,
     `- [About PluginLint](${abs('/about/')}): who runs it, how rules are sourced, independence from OpenAI.`,
     `- [Privacy](${abs('/privacy/')})`,
     `- [Rules changes RSS feed](${abs('/rss.xml')})`,

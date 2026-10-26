@@ -1,6 +1,8 @@
 ---
 import Base from '../layouts/Base.astro';
-import { ANALYTICS_SCRIPT_URL, BEEHIIV_EMBED_URL, GOOGLE_FORM_URL, ADSENSE_CLIENT } from '../../site.config.mjs';
+import { ANALYTICS_SCRIPT_URL, BEEHIIV_EMBED_URL, GOOGLE_FORM_URL, ADSENSE_CLIENT, REVIEW_PAYMENT_URL_STARTER, REVIEW_PAYMENT_URL_FULL } from '../../site.config.mjs';
+import { u } from '../lib/url';
+const reviewPay = Boolean(REVIEW_PAYMENT_URL_STARTER || REVIEW_PAYMENT_URL_FULL);
 ---
 <Base title="Privacy Policy" description="PluginLint's tools run entirely in your browser. Nothing you paste is sent or stored. No cookies, no tracking. Which third-party services may be embedded." crumbName="Privacy">
   <h1>Privacy</h1>
@@ -17,6 +19,7 @@ import { ANALYTICS_SCRIPT_URL, BEEHIIV_EMBED_URL, GOOGLE_FORM_URL, ADSENSE_CLIEN
   <ul>
     <li><strong>Newsletter:</strong> {BEEHIIV_EMBED_URL ? 'the sign-up form is provided by beehiiv. If you subscribe, beehiiv processes your email address under its privacy policy.' : 'not enabled yet. If added, the sign-up form will be provided by beehiiv and this page will be updated.'}</li>
     <li><strong>Feedback form:</strong> {GOOGLE_FORM_URL ? 'the feedback link opens a Google Form; Google processes what you submit there.' : 'not enabled yet. If added, it will be a Google Form hosted by Google.'}</li>
+    <li><strong>Paid review:</strong> the optional <a href={u('/review/')}>submission review</a> is requested through the Google Form above{reviewPay ? ', and payment is handled by a third-party payment provider under its own privacy policy' : '; payment details are sent by reply and payment is handled by a third-party payment provider'}. This site never sees or stores card details. Materials you send for a review are used only to write your report and are not published.</li>
     <li><strong>Advertising:</strong> {ADSENSE_CLIENT ? 'Google AdSense serves ads and may use cookies; see Google’s policies.' : 'none. If ads are added later, this page will be updated first, including any consent requirements.'}</li>
   </ul>
   <h2>Contact</h2>
