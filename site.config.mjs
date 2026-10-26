@@ -3,7 +3,7 @@
 //
 //   GitHub Pages project site : SITE_URL=https://<user>.github.io   BASE_PATH=/pluginlint
 //   Custom domain (later)     : SITE_URL=https://pluginlint.example  BASE_PATH=/
-export const SITE_URL = process.env.SITE_URL || 'https://USERNAME.github.io';
+export const SITE_URL = process.env.SITE_URL || 'https://kalimathastrology-arch.github.io';
 export const BASE_PATH = process.env.BASE_PATH || '/pluginlint';
 
 export const SITE_NAME = 'PluginLint';
