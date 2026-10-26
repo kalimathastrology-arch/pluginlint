@@ -70,9 +70,11 @@ export function diffSummary(oldText, newText, maxLines = 25) {
 
 async function fetchOnce(url) {
   if (new URL(url).host !== ALLOWED_HOST) throw new Error(`Refusing to fetch non-allowlisted host: ${url}`);
-  const res = await fetch(url, { headers: { 'User-Agent': USER_AGENT, Accept: 'text/html' }, redirect: 'follow' });
+  const res = await fetch(url, { headers: { 'User-Agent': USER_AGENT, Accept: 'text/html' }, redirect: 'manual' });
+  // Redirects are not followed, so each page gets exactly one request per run and never leaves the allowlisted host.
+  // If a page moves, update PAGES by hand.
+  if (res.status >= 300 && res.status < 400) throw new Error(`${url} → HTTP ${res.status} redirect to ${res.headers.get('location')}; update PAGES`);
   if (!res.ok) throw new Error(`${url} → HTTP ${res.status}`);
-  if (new URL(res.url).host !== ALLOWED_HOST) throw new Error(`Redirected off allowlisted host: ${res.url}`);
   return res.text();
 }
 
