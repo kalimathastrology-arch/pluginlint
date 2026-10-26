@@ -3,13 +3,13 @@
 > Post only after user approval, from the user’s own HN account. HN guidelines: Show HN is for things people can try. Don’t ask for upvotes, and don’t have friends upvote or comment.
 
 **Title (≤80 chars):**
-Show HN: PluginLint – check a ChatGPT plugin submission in the browser
+Show HN: PluginLint – open-source linter for ChatGPT app submissions
 
 **URL:** SITE/
 
 **First comment (by the author):**
 
-I built PluginLint after reading OpenAI’s plugin submission-errors page. Many rejections come down to mechanical rules: name and subtitle length, duplicate starter prompts, brand-colour contrast, screenshot sizes, missing tool annotations, and test-case counts.
+PluginLint is an MIT-licensed, client-side linter for ChatGPT app/plugin directory submissions. Source: https://github.com/kalimathastrology-arch/pluginlint . I built it after reading OpenAI’s plugin submission-errors page. Many rejections come down to mechanical rules: name and subtitle length, duplicate starter prompts, brand-colour contrast, screenshot sizes, missing tool annotations, and test-case counts.
 
 It is a static Astro site with three tools that run entirely client-side:
 
