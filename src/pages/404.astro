@@ -2,7 +2,7 @@
 import Base from '../layouts/Base.astro';
 import { u } from '../lib/url';
 ---
-<Base title="Page not found" description="This page does not exist.">
+<Base title="Page not found" description="This page does not exist." noindex>
   <h1>Page not found</h1>
-  <p>Try the <a href={u('/grader/')}>grader</a>, the <a href={u('/tools/')}>tools</a> or the <a href={u('/rules/')}>rules reference</a>.</p>
+  <p>Try the <a href={u('/grader/')}>grader</a>, the <a href={u('/tools/')}>tools</a> the <a href={u('/rules/')}>rules reference</a> or the <a href={u('/guides/')}>guides</a>.</p>
 </Base>

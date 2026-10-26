@@ -7,7 +7,7 @@ import { u } from '../lib/url';
 type Entry = { date: string; title: string; url: string; type: string; summary: string; diff?: { added: string[]; removed: string[] } };
 const entries = history.entries as Entry[];
 ---
-<Base title="ChatGPT plugin directory rules and limits" description={`Reference of every ChatGPT plugin directory listing limit — display name ${LIMITS.displayName}, subtitle ${LIMITS.subtitle}, description ${LIMITS.longDescription.toLocaleString('en-US')} characters, starter prompts, capabilities, URLs, brand colours, screenshots — with sources and a changelog.`}>
+<Base title="ChatGPT Plugin Directory Rules and Limits" description={`Every ChatGPT plugin listing limit in one table — display name ${LIMITS.displayName}, subtitle ${LIMITS.subtitle}, description ${LIMITS.longDescription.toLocaleString('en-US')} chars, prompts, URLs — with sources and a changelog.`} crumbName="Rules and limits">
   <h1>Plugin directory rules &amp; limits</h1>
   <p class="lede">The final-submission limits for a ChatGPT plugin directory listing, in one table, with the OpenAI page each rule comes from.</p>
   <p class="meta">Last checked by hand: <time datetime={LAST_CHECKED}>{LAST_CHECKED}</time>. A watcher also re-reads the two source pages daily and logs changes below.</p>
@@ -51,6 +51,7 @@ const entries = history.entries as Entry[];
   </ul>
 
   <p><a class="btn" href={u('/grader/')}>Check your listing against these rules</a></p>
+  <p>Explained in plain English: <a href={u('/guides/submission-errors-explained/')}>submission errors</a> · <a href={u('/guides/plugin-name-character-limit/')}>name limit</a> · <a href={u('/guides/starter-prompts-rules/')}>starter prompts</a> · <a href={u('/guides/screenshot-size-requirements/')}>screenshots</a> · <a href={u('/guides/mcp-tool-annotations/')}>MCP tool annotations</a> · <a href={u('/guides/why-chatgpt-plugin-submissions-get-rejected/')}>why submissions get rejected</a>.</p>
 
   <h2 id="changelog">Changelog of the source pages</h2>
   <p>Generated from <code>data/rules-history.json</code>, which the docs watcher updates when the text of either OpenAI page changes. Also available as an <a href={u('/rss.xml')}>RSS feed</a>.</p>

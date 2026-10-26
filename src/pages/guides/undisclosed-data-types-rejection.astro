@@ -2,7 +2,7 @@
 import Guide from '../../layouts/Guide.astro';
 import { u } from '../../lib/url';
 ---
-<Guide title="Fixing the “returns undisclosed user-related data types” rejection" description="Why ChatGPT plugins get rejected for returning data their privacy policy doesn't disclose, what fields to remove (session/trace/request IDs, timestamps, internal account IDs, logs, secrets), and how to audit tool outputs." sources={['appReview', 'guidelines']}>
+<Guide title="Fixing the “returns undisclosed user-related data types” rejection" seoTitle="MCP Tool Output Privacy: Undisclosed Data Fix" description="Fix the ChatGPT plugin rejection for undisclosed user data: strip session, trace and request IDs, timestamps, internal IDs and secrets from tool output." summary="return less, not more policy. Remove unnecessary PII, session/trace/request IDs, timestamps, internal account IDs, logs and auth secrets from tool responses. Only disclose in your privacy policy the fields you truly need — OpenAI’s review page says to remove a field rather than disclose it if it isn’t needed." sources={['appReview', 'guidelines']}>
   <p class="lede">OpenAI’s review page lists this among common rejection reasons for remote MCP plugins: “Your plugin returns user-related data types that are not disclosed in your privacy policy.” The fix is usually to return less, not to write more policy.</p>
 
   <h2>What OpenAI asks you to do</h2>
@@ -36,5 +36,6 @@ import { u } from '../../lib/url';
 
   <h2>What a disclosure should cover</h2>
   <p>The guidelines say a privacy policy must explain, at minimum, the categories of personal data collected, the purposes of use, the categories of recipients, data retention timelines, and any controls offered to users. The auditor drafts a paragraph for the categories it found; you still need to fill in retention, recipients and controls truthfully.</p>
+  <p>Related: <a href={u('/guides/why-chatgpt-plugin-submissions-get-rejected/')}>the other common rejection reasons</a>.</p>
   <p class="meta">This guide is general information, not legal advice.</p>
 </Guide>

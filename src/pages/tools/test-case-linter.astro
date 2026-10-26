@@ -2,7 +2,8 @@
 import Base from '../../layouts/Base.astro';
 import Sources from '../../components/Sources.astro';
 import { u } from '../../lib/url';
-const ld = { '@context': 'https://schema.org', '@type': 'WebApplication', name: 'PluginLint test-case linter', applicationCategory: 'DeveloperApplication', operatingSystem: 'Any (runs in your browser)', offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' } };
+import { softwareAppLd } from '../../lib/seo';
+const ld = softwareAppLd({ name: 'PluginLint test-case linter', description: 'Checks ChatGPT plugin review test cases: exactly 5 positive and 3 negative, required fields, tool names, annotations. Outputs schema-valid JSON locally.', url: new URL(u('/tools/test-case-linter/'), Astro.site).toString() });
 const exampleDraft = JSON.stringify({
   test_cases: [
     { description: 'Lists unpaid invoices', user_prompt: 'Show my unpaid invoices from last month', tools_triggered: 'search_invoices', expected_output: 'A list of unpaid invoices dated last month with number, customer and amount.' },
@@ -15,7 +16,7 @@ const exampleDraft = JSON.stringify({
   },
 }, null, 2);
 ---
-<Base title="MCP plugin test-case linter (5 positive + 3 negative)" description="Paste your MCP tools/list result and draft test cases. Checks exactly 5 positive and 3 negative cases, required fields, tool names, annotations, state-changing tools and vague prompts, then outputs a schema-valid chatgpt-app-submission.json. Runs in your browser." jsonLd={ld}>
+<Base title="MCP Test-Case Linter (5 Positive + 3 Negative)" description="Checks ChatGPT plugin review test cases: exactly 5 positive and 3 negative, required fields, tool names, annotations. Outputs schema-valid JSON locally." jsonLd={ld} crumbs={[['Tools', '/tools/']]} crumbName="Test-case linter">
   <h1>Test-case linter</h1>
   <p class="lede">For remote MCP plugins, OpenAI’s submission-errors page requires “exactly five positive test cases, three negative test cases, and release notes”. This tool checks your draft and produces an import file shaped to OpenAI’s public <code>chatgpt-app-submission.v1.json</code> schema.</p>
   <p class="card"><strong>Nothing leaves your browser.</strong> The schema check runs locally against a copy of the public schema fetched on 2026-10-26.</p>

@@ -1,0 +1,39 @@
+---
+import Guide from '../../layouts/Guide.astro';
+import { u } from '../../lib/url';
+---
+<Guide title="Why ChatGPT plugin submissions get rejected: the mechanical causes" seoTitle="Why ChatGPT Plugin Submissions Get Rejected" description="The common reasons OpenAI rejects ChatGPT plugins with an MCP server: unreachable server or login, failing test cases, undisclosed data, wrong annotations." summary="OpenAI’s review page lists four common rejection reasons for plugins with a remote MCP server: reviewers can’t connect with the URL and test credentials you gave, a test case doesn’t produce the expected result, tools return user data your privacy policy doesn’t disclose, or tool annotations don’t match what the tools do. Most are mechanical and checkable before you submit." sources={['appReview', 'guidelines', 'submissionErrors']}>
+  <h2>Submission errors vs. review rejections</h2>
+  <p>Two different things can stop a plugin. <strong>Submission errors</strong> appear in the portal before review starts; the submission-errors reference says errors block submission and warnings don’t. They are covered in <a href={u('/guides/submission-errors-explained/')}>submission errors explained</a>. A <strong>rejection</strong> happens after review. OpenAI’s review page says that if a plugin is rejected because of its MCP server, tools or UI, you receive feedback on which checks were unsuccessful, can make changes and resubmit, and can appeal by replying to the email with a clear rationale and any new information.</p>
+
+  <h2>The four common rejection reasons</h2>
+  <p>These are the reasons OpenAI lists under “common rejection reasons” on its <a href="https://developers.openai.com/plugins/deploy/app-review" rel="noopener">remote MCP server review requirements</a> page, with what to check.</p>
+  <table>
+    <thead><tr><th>Rejection reason (paraphrased)</th><th>What to check before you submit</th></tr></thead>
+    <tbody>
+      <tr><td>Reviewers can’t connect to your MCP server with the URL and/or test credentials provided.</td><td>The URL and credentials are correct and haven’t expired; the demo account needs no further configuration; there is no MFA (SMS codes, email or other verification); and the login works from outside your company or local network.</td></tr>
+      <tr><td>One or more test cases did not produce correct results.</td><td>Rerun every test case and compare the actual output with your expected output; check the UI (if any) loads without errors; make sure the answer sticks to the request without extraneous information such as personal identifiers; and confirm the cases pass on the ChatGPT and Codex surfaces where the plugin will be available. See <a href={u('/guides/mcp-test-cases/')}>writing the 5 + 3 test cases</a>.</td></tr>
+      <tr><td>Your plugin returns user-related data types not disclosed in your privacy policy.</td><td>List every user-related field your tools return, including nested fields and debug payloads, and remove what isn’t strictly needed. See <a href={u('/guides/undisclosed-data-types-rejection/')}>fixing the undisclosed data types rejection</a> and the <a href={u('/tools/tool-output-privacy-audit/')}>tool-output privacy auditor</a>.</td></tr>
+      <tr><td>Tool hint annotations don’t appear to match the tool’s behavior.</td><td>Set <code>readOnlyHint</code>, <code>destructiveHint</code> and <code>openWorldHint</code> on each tool to values that match what it really does. See <a href={u('/guides/mcp-tool-annotations/')}>MCP tool annotations explained</a>.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Other documented rejection causes</h2>
+  <ul>
+    <li><strong>Unverified publisher name.</strong> The review page says publishing under an unverified individual or business name will result in rejection. Complete individual or business verification in the OpenAI Platform Dashboard for the name you plan to publish under.</li>
+    <li><strong>Demo accounts with extra login steps.</strong> The plugin guidelines say to provide a login and password for a fully featured demo account with sample data, and that plugins requiring additional login steps, such as a new account sign-up or 2FA through an inaccessible account, will be rejected.</li>
+    <li><strong>Unclear tool descriptions.</strong> The guidelines say each tool needs a non-empty description of its purpose, behavior, when to use it, and any limitations or side effects, and that the plugin may be rejected if a tool’s behavior is unclear or incomplete from its description.</li>
+    <li><strong>Trial or demo plugins.</strong> The guidelines say plugins should be stable, responsive and complete, and that trial or demo plugins will not be accepted.</li>
+    <li><strong>Iframes that can’t be assessed.</strong> Plugins with UI that embed pages must justify each embedded page; the guidelines say iframe use may lead to slower approval or rejection if the content cannot be assessed.</li>
+  </ul>
+
+  <h2>A pre-submission routine</h2>
+  <ol>
+    <li>Run the <a href={u('/grader/')}>listing grader</a> so the listing fields pass the final-submission limits.</li>
+    <li>Log in to your demo account from a network outside your office, with no MFA prompt, and run every test-case prompt.</li>
+    <li>Paste the raw tool results into the <a href={u('/tools/tool-output-privacy-audit/')}>privacy auditor</a> and remove what isn’t needed.</li>
+    <li>Paste your <code>tools/list</code> result and draft cases into the <a href={u('/tools/test-case-linter/')}>test-case linter</a> to catch missing annotations, wrong tool names and the wrong number of cases.</li>
+    <li>Check that the name you publish under matches your verified identity.</li>
+  </ol>
+  <p>Passing these checks does not guarantee approval — OpenAI’s reviewers decide — but it removes the mechanical causes listed above.</p>
+</Guide>

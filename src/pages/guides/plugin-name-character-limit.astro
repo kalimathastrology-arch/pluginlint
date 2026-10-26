@@ -1,9 +1,9 @@
 ---
 import Guide from '../../layouts/Guide.astro';
 import { LIMITS } from '../../lib/rules-data';
+import { u } from '../../lib/url';
 ---
-<Guide title="ChatGPT plugin name character limit (and naming rules)" description={`The display name of a ChatGPT directory plugin must be one line and at most ${LIMITS.displayName} characters at final submission. Here is how the limit works, how it differs from the package name, and what the naming guidelines say.`}>
-  <p class="lede">Short answer: your plugin’s <strong>display name</strong> must be <strong>one line and at most {LIMITS.displayName} characters</strong> for final directory submission.</p>
+<Guide title="ChatGPT plugin name character limit (and naming rules)" seoTitle="ChatGPT Plugin Name Character Limit (30 chars)" description={`A ChatGPT plugin display name must be one line and at most ${LIMITS.displayName} characters at final submission. How it differs from the package name, plus naming rules.`} summary={`your plugin’s display name must be one line and at most ${LIMITS.displayName} characters for final directory submission. Upload validation accepts up to ${LIMITS.pkgDisplayName}, so a longer name can upload and still be blocked at the final step. Don’t append “MCP”, “MCP Server” or “Plugin”.`}>
 
   <h2>Three different “names”</h2>
   <p>A plugin package has several name-like fields, and they have different limits. Mixing them up is the most common source of confusion.</p>
@@ -16,7 +16,7 @@ import { LIMITS } from '../../lib/rules-data';
   <p>The package name is the machine identifier (think <code>acme-ledger</code>). The display name is what people see in the directory (think “Acme Ledger”). An update must keep the same package name as the existing plugin (<code>plugin_name_mismatch</code>).</p>
 
   <h2>Why your upload passed but submission failed</h2>
-  <p>OpenAI validates twice. The upload check accepts a display name of up to {LIMITS.pkgDisplayName} characters, but final directory submission only accepts {LIMITS.displayName}. If your name is, say, 42 characters long, the ZIP uploads fine and then <code>submission_display_name_too_long</code> blocks the final step. Write to the {LIMITS.displayName}-character limit from the start.</p>
+  <p>OpenAI validates twice. The upload check accepts a display name of up to {LIMITS.pkgDisplayName} characters, but final directory submission only accepts {LIMITS.displayName}. If your name is, say, 42 characters long, the ZIP uploads fine and then <code>submission_display_name_too_long</code> blocks the final step. Write to the {LIMITS.displayName}-character limit from the start. The <a href={u('/guides/submission-errors-explained/')}>submission errors guide</a> lists the other fields with two different limits.</p>
 
   <h2>Related errors</h2>
   <ul>
@@ -35,7 +35,7 @@ import { LIMITS } from '../../lib/rules-data';
     <li><strong>Don’t append “MCP”, “MCP Server” or “Plugin”</strong> to a company or product name. Use “Acme”, not “Acme MCP” or “Acme Plugin”.</li>
     <li><strong>Don’t imply OpenAI made or endorsed it.</strong> Words like “official” deserve a second look.</li>
   </ul>
-  <p>These are review guidelines, not automated error codes, so the PluginLint grader shows them as <em>warnings</em> for you to judge.</p>
+  <p>These are review guidelines, not automated error codes, so the <a href={u('/grader/')}>PluginLint grader</a> shows them as <em>warnings</em> for you to judge.</p>
 
   <h2>Fitting a name into 30 characters</h2>
   <ol>

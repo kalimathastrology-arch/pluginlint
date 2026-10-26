@@ -1,22 +1,58 @@
 ---
 import Base from './Base.astro';
 import Sources from '../components/Sources.astro';
-import { LAST_CHECKED, type SourceKey } from '../lib/rules-data';
+import Faq from '../components/Faq.astro';
+import { LAST_CHECKED, SOURCES, type SourceKey } from '../lib/rules-data';
+import { FAQS } from '../lib/faqs';
+import { GUIDES } from '../lib/guides';
 import { u } from '../lib/url';
-interface Props { title: string; description: string; sources?: SourceKey[] }
-const { title, description, sources } = Astro.props;
+import { canonicalPath } from '../lib/seo';
+import { lastModified, firstPublished } from '../lib/git-dates.mjs';
+interface Props {
+  /** Visible H1. */
+  title: string;
+  /** Shorter <title> (≤ 50 chars so " | PluginLint" keeps it ≤ 60). Defaults to title. */
+  seoTitle?: string;
+  description: string;
+  /** Answer-first summary shown right under the H1 ("In short: …"). */
+  summary: string;
+  sources?: SourceKey[];
+}
+const { title, seoTitle, description, summary, sources } = Astro.props;
+const slug = canonicalPath(Astro.url.pathname).replace(/\/$/, '').split('/').pop()!;
+const file = `src/pages/guides/${slug}.astro`;
+const today = new Date().toISOString().slice(0, 10);
+const modified = lastModified(file, 'src/lib/faqs.ts', 'src/lib/rules-data.ts') ?? today;
+const published = firstPublished(file) ?? modified;
+const faqs = FAQS[slug] ?? [];
+const canonical = new URL(canonicalPath(Astro.url.pathname), Astro.site).toString();
 const ld = {
   '@context': 'https://schema.org', '@type': 'TechArticle', headline: title, description,
-  dateModified: LAST_CHECKED, datePublished: '2026-10-26', author: { '@type': 'Organization', name: 'PluginLint' },
-  mainEntityOfPage: new URL(Astro.url.pathname, Astro.site).toString(),
+  datePublished: published, dateModified: modified, inLanguage: 'en',
+  image: new URL(u('/og.png'), Astro.site).toString(),
+  author: { '@type': 'Organization', name: 'PluginLint', url: new URL(u('/'), Astro.site).toString() },
+  publisher: { '@id': `${new URL(u('/'), Astro.site).toString()}#org` },
+  mainEntityOfPage: canonical,
+  isBasedOn: (sources ?? ['submissionErrors', 'guidelines']).map((k) => SOURCES[k].url),
 };
+const related = GUIDES.filter((g) => g.slug !== slug);
+const short = GUIDES.find((g) => g.slug === slug)?.short ?? title;
 ---
-<Base title={title} description={description} jsonLd={ld} type="article">
-  <p class="meta"><a href={u('/guides/')}>Guides</a> › Last checked <time datetime={LAST_CHECKED}>{LAST_CHECKED}</time></p>
+<Base title={seoTitle ?? title} description={description} jsonLd={ld} type="article" crumbs={[['Guides', '/guides/']]} crumbName={short}>
   <article>
     <h1>{title}</h1>
+    <p class="meta">Updated <time datetime={modified}>{modified}</time> · Rules last checked against OpenAI’s docs on <time datetime={LAST_CHECKED}>{LAST_CHECKED}</time></p>
+    <p class="answer"><strong>In short:</strong> {summary}</p>
     <slot />
+    {faqs.length > 0 && <Faq faqs={faqs} />}
   </article>
   <p><a class="btn" href={u('/grader/')}>Check your listing with the free grader</a></p>
   <Sources keys={sources} />
+  <nav aria-labelledby="more-guides">
+    <h2 id="more-guides">More guides</h2>
+    <ul>
+      {related.map((g) => <li><a href={u(`/guides/${g.slug}/`)}>{g.title}</a></li>)}
+    </ul>
+    <p>Tools: <a href={u('/grader/')}>listing grader</a> · <a href={u('/tools/tool-output-privacy-audit/')}>tool-output privacy auditor</a> · <a href={u('/tools/test-case-linter/')}>test-case linter</a> · <a href={u('/rules/')}>all rules and limits</a></p>
+  </nav>
 </Base>

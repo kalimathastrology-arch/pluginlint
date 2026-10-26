@@ -1,0 +1,43 @@
+---
+import Guide from '../../layouts/Guide.astro';
+import { u } from '../../lib/url';
+---
+<Guide title="MCP tool annotations: readOnlyHint, openWorldHint and destructiveHint explained" seoTitle="MCP Tool Annotations Explained (readOnlyHint…)" description="How to set readOnlyHint, destructiveHint and openWorldHint on each MCP tool for a ChatGPT plugin submission, with the edge cases OpenAI calls out." summary="every MCP tool in a ChatGPT plugin must set readOnlyHint, destructiveHint and openWorldHint to explicit true or false values that match what the tool actually does. Read-only means nothing is modified; destructive means a write can have destructive or irreversible effects; open-world means the tool reaches public or open-ended entities rather than a bounded private account." sources={['guidelines', 'appReview', 'submissionErrors']}>
+  <h2>Where the annotations live</h2>
+  <p>The plugin guidelines say to set <code>readOnlyHint</code>, <code>destructiveHint</code> and <code>openWorldHint</code> to explicit boolean values in each tool’s <code>annotations</code> object. The submission-errors reference lists <code>annotations_required</code>: every MCP tool must set all three accurately. When you select Scan Tools in the submission portal, OpenAI’s review page says the annotation values your server advertises are imported into the draft and displayed there.</p>
+  <pre><code>{`{
+  "name": "list_invoices",
+  "description": "Lists the signed-in user's invoices. Read-only.",
+  "annotations": { "readOnlyHint": true, "destructiveHint": false, "openWorldHint": false }
+}`}</code></pre>
+
+  <h2>The three hints</h2>
+  <table>
+    <thead><tr><th>Annotation</th><th>Use <code>true</code> when…</th><th>Use <code>false</code> when…</th></tr></thead>
+    <tbody>
+      <tr><td><code>readOnlyHint</code></td><td>The tool only retrieves, computes or previews and does not modify the environment.</td><td>It changes external state, persists artifacts, starts stateful jobs or workflows, queues work, or performs write-style outbound actions such as posting messages, sending emails or uploading files.</td></tr>
+      <tr><td><code>destructiveHint</code></td><td>A write can have potentially destructive or irreversible effects: deletion, overwriting, cancellation, access revocation, or irreversible sends or transactions.</td><td>The tool is read-only, or it is an additive write without destructive or irreversible effects.</td></tr>
+      <tr><td><code>openWorldHint</code></td><td>The tool works with public or open-ended entities, including read-only web search and arbitrary destinations.</td><td>The tool is confined to a bounded private account, workspace or catalog — even when that service is externally hosted.</td></tr>
+    </tbody>
+  </table>
+  <p class="meta">Wording paraphrased from the “Correct annotation” section of OpenAI’s plugin guidelines.</p>
+
+  <h2>Edge cases the docs call out</h2>
+  <ul>
+    <li><strong>Undo doesn’t make it non-destructive.</strong> The guidelines say being able to undo an action does not, by itself, justify setting <code>destructiveHint</code> to false.</li>
+    <li><strong>Connectivity isn’t the test for open-world.</strong> The guidelines say connectivity alone does not determine <code>openWorldHint</code>. Calling your own hosted API for the user’s private workspace can still be <code>false</code>.</li>
+    <li><strong>“Write logs”, “enqueue tasks” and “start workflows” count as state changes.</strong> The review page lists these among actions that make <code>readOnlyHint</code> false.</li>
+    <li><strong>Destructive in some modes is destructive.</strong> The review page says to set the destructive annotation to true if the tool can cause irreversible outcomes even in only select modes, through default parameters, or through indirect side effects.</li>
+    <li><strong>Posting publicly is open-world.</strong> The review page’s open-world examples include write tools that post to public platforms, send messages to external recipients, publish content, push code or submit forms.</li>
+  </ul>
+
+  <h2>Justifications: the docs disagree</h2>
+  <p>The plugin guidelines now say “Annotation justifications are no longer required.” The submission-errors reference still lists <code>justification_required</code>, and the review page says submission justifications should explain why the server-provided values match each tool’s behavior. Both were live on the last-checked date. If the portal asks for justifications, provide one sentence per annotation.</p>
+  <p>Either way, a justification can’t change the value. The review page’s example: if your server advertises <code>readOnlyHint: false</code>, calling the tool “functionally read-only” in the justification doesn’t make it read-only. If it really is read-only, change the server annotation, deploy, select Scan Tools again, verify the new value and then submit.</p>
+
+  <h2>Annotations are not a permission system</h2>
+  <p>The guidelines say annotations inform client safeguards; they do not grant permission or replace authentication, authorization and scope checks, input validation, or human confirmation for irreversible operations. If automated review flags an annotation issue, the guidelines say you can submit an appeal with clarification or additional information.</p>
+
+  <h2>Check them automatically</h2>
+  <p>Paste your <code>tools/list</code> result into the <a href={u('/tools/test-case-linter/')}>test-case linter</a>. It fails any tool missing an explicit boolean for one of the three hints and warns when a tool is marked both read-only and destructive. Mismatched annotations are one of the <a href={u('/guides/why-chatgpt-plugin-submissions-get-rejected/')}>common rejection reasons</a>.</p>
+</Guide>

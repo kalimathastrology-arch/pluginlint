@@ -4,11 +4,15 @@ import { BEEHIIV_EMBED_URL, BEEHIIV_FORM_ID } from '../../site.config.mjs';
 import { LIMITS, LAST_CHECKED } from '../lib/rules-data';
 import { u } from '../lib/url';
 import history from '../../data/rules-history.json';
+import Faq from '../components/Faq.astro';
+import { FAQS } from '../lib/faqs';
+import { GUIDES } from '../lib/guides';
 const latest = (history.entries as { date: string; title: string; summary: string }[])[0];
 ---
-<Base title="PluginLint" description="PluginLint is a free, private toolkit for developers listing a plugin in the ChatGPT plugin directory: a browser-only listing grader, a rules reference with sources, and plain-English guides.">
+<Base title="ChatGPT Plugin Submission Checklist & Grader | PluginLint" description="Free, private tools for a ChatGPT plugin submission: checklist, listing grader, MCP tool-output privacy auditor, test-case linter and sourced rules.">
   <h1>Get your ChatGPT plugin listing right the first time</h1>
   <p class="lede">PluginLint is a free toolkit for developers submitting a plugin to the ChatGPT plugin directory. Check your listing fields against OpenAI’s published limits before the submission portal rejects them.</p>
+  <p class="answer"><strong>In short:</strong> a ChatGPT directory plugin’s display name and short description must each be one line of at most {LIMITS.displayName} characters, the long description at most {LIMITS.longDescription.toLocaleString('en-US')}, and you can add up to {LIMITS.starterPromptsMax} starter prompts. Plugins with a remote MCP server also need exactly five positive and three negative test cases and explicit tool annotations. PluginLint checks these in your browser before you submit.</p>
   <p><a class="btn" href={u('/grader/')}>Open the listing grader</a> <a class="btn secondary" href={u('/rules/')}>See all the limits</a></p>
 
   <h2>What you get</h2>
@@ -31,14 +35,25 @@ const latest = (history.entries as { date: string; title: string; summary: strin
   <div class="card">
     <h3>Plain-English guides</h3>
     <ul>
-      <li><a href={u('/guides/plugin-name-character-limit/')}>Plugin name character limit (and naming rules)</a></li>
-      <li><a href={u('/guides/starter-prompts-rules/')}>Starter prompt rules</a></li>
-      <li><a href={u('/guides/submission-errors-explained/')}>Submission errors explained</a></li>
-      <li><a href={u('/guides/undisclosed-data-types-rejection/')}>Fixing the “undisclosed data types” rejection</a></li>
-      <li><a href={u('/guides/mcp-test-cases/')}>Writing the 5 positive + 3 negative test cases</a></li>
-      <li><a href={u('/guides/screenshot-size-requirements/')}>Screenshot size requirements</a></li>
+      {GUIDES.map((g) => <li><a href={u(`/guides/${g.slug}/`)}>{g.title}</a></li>)}
     </ul>
   </div>
+
+  <h2 id="checklist">ChatGPT plugin submission checklist</h2>
+  <p>What final directory submission checks, per OpenAI’s <a href="https://developers.openai.com/plugins/deploy/submission-errors" rel="noopener">submission-errors reference</a>. Items marked “remote MCP” apply only to plugins with a remote MCP server.</p>
+  <ul>
+    <li>Listing fields within the final limits below — check them with the <a href={u('/grader/')}>listing grader</a>.</li>
+    <li>A category from the supported list and a semantic version; a new release needs a new version (<a href={u('/rules/')}>all rules</a>).</li>
+    <li>Passing safety and security scans for every bundled skill (can take up to 2 hours).</li>
+    <li>A verified developer or business identity and all required policy attestations.</li>
+    <li>Remote MCP: HTTPS website, support, privacy policy and terms URLs, and a demo-recording URL.</li>
+    <li>Remote MCP: exactly five positive and three negative test cases plus release notes — <a href={u('/tools/test-case-linter/')}>lint them</a> (<a href={u('/guides/mcp-test-cases/')}>guide</a>).</li>
+    <li>Remote MCP: a production HTTPS MCP server URL, a completed domain-verification challenge and a current tool scan.</li>
+    <li>Remote MCP: explicit <code>readOnlyHint</code>, <code>openWorldHint</code> and <code>destructiveHint</code> on every tool (<a href={u('/guides/mcp-tool-annotations/')}>annotations explained</a>).</li>
+    <li>Remote MCP: reviewer-ready demo credentials when the server uses OAuth, and screenshots only if the server provides custom UI (<a href={u('/guides/screenshot-size-requirements/')}>sizes</a>).</li>
+    <li>Tool outputs that return only what the request needs — <a href={u('/tools/tool-output-privacy-audit/')}>audit them</a> (<a href={u('/guides/undisclosed-data-types-rejection/')}>why</a>).</li>
+  </ul>
+  <p>Then read <a href={u('/guides/why-chatgpt-plugin-submissions-get-rejected/')}>why ChatGPT plugin submissions get rejected</a> for the review-stage causes.</p>
 
   <h2>The limits people hit most</h2>
   <table>
@@ -63,6 +78,8 @@ const latest = (history.entries as { date: string; title: string; summary: strin
       <p><strong>TODO (site owner):</strong> newsletter sign-up goes here. Set <code>BEEHIIV_FORM_ID</code> in <code>site.config.mjs</code>. Until then no sign-up form is shown and no email is collected.</p>
     </div>
   )}
+
+  <Faq faqs={FAQS.home} />
 
   <h2>Who runs this?</h2>
   <p>An independent developer. PluginLint is not affiliated with OpenAI. It uses only OpenAI’s public developer documentation as its source and does not collect or scrape data from chatgpt.com. <a href={u('/about/')}>More about the project</a>.</p>

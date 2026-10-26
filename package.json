@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
+    "check": "node scripts/check-dist.mjs",
     "preview": "astro preview",
     "test": "vitest run",
     "watch-docs": "node scripts/watch-docs.mjs"

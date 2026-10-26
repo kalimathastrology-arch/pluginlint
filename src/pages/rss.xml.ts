@@ -6,6 +6,8 @@ export function GET(context: APIContext) {
   const base = import.meta.env.BASE_URL.replace(/\/$/, '');
   return rss({
     trailingSlash: false,
+    xmlns: { atom: 'http://www.w3.org/2005/Atom' },
+    customData: `<language>en</language><atom:link href="${context.site!.toString().replace(/\/$/, '')}${base}/rss.xml" rel="self" type="application/rss+xml"/>`,
     title: 'PluginLint — OpenAI plugin docs changes',
     description: 'Dated changes detected in the OpenAI plugin submission-errors and plugin-guidelines pages.',
     site: context.site!.toString().replace(/\/$/, '') + base + '/',

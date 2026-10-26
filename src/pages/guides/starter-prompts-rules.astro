@@ -1,8 +1,9 @@
 ---
 import Guide from '../../layouts/Guide.astro';
 import { LIMITS } from '../../lib/rules-data';
+import { u } from '../../lib/url';
 ---
-<Guide title="ChatGPT plugin starter prompt rules" description={`Starter prompts for a ChatGPT directory plugin: at most ${LIMITS.starterPromptsMax}, each one line and ≤ ${LIMITS.starterPrompt} characters, unique after normalisation, with no MCP server @mentions. Rules, error codes and writing tips.`}>
+<Guide title="ChatGPT plugin starter prompt rules" seoTitle="ChatGPT Plugin Starter Prompt Rules & Limits" description={`ChatGPT plugin starter prompts: at most ${LIMITS.starterPromptsMax}, each one line and ≤ ${LIMITS.starterPrompt} characters, unique, with no MCP server @mentions. Rules, error codes and tips.`} summary={`you can add at most ${LIMITS.starterPromptsMax} starter prompts. Each must be one line, non-empty, at most ${LIMITS.starterPrompt} characters, unique after Unicode and whitespace normalization, and free of MCP server @mentions.`}>
   <p class="lede">Starter prompts (the <code>interface.defaultPrompt</code> field) are the example requests shown with your listing. The guidelines say screenshots are no longer shown in the Directory and that you should instead provide example prompts that help users get started — so these few lines matter.</p>
 
   <h2>The rules</h2>
@@ -24,14 +25,14 @@ import { LIMITS } from '../../lib/rules-data';
   <p>A prompt like “Ask @acme to list my invoices” names an MCP server directly. The submission check rejects these. Write the task the way a user would naturally ask: “List my unpaid invoices from last month.”</p>
 
   <h2>Screenshots and prompts</h2>
-  <p>If your remote MCP plugin has custom UI and you add screenshots, you must provide one screenshot for every starter prompt. See <a href="../screenshot-size-requirements/">screenshot size requirements</a>.</p>
+  <p>If your remote MCP plugin has custom UI and you add screenshots, you must provide one screenshot for every starter prompt. See <a href={u('/guides/screenshot-size-requirements/')}>screenshot size requirements</a>.</p>
 
   <h2>Writing prompts that work</h2>
   <ul>
     <li><strong>Cover three different jobs.</strong> Use each slot for a distinct use case rather than three phrasings of one.</li>
     <li><strong>Be concrete.</strong> “Summarise yesterday’s support tickets tagged billing” teaches more than “Help with support”.</li>
     <li><strong>Stay well under {LIMITS.starterPrompt} characters.</strong> Short prompts are easier to scan.</li>
-    <li><strong>Make them succeed.</strong> A reviewer may try them. Pick requests your plugin handles reliably with demo data.</li>
+    <li><strong>Make them succeed.</strong> A reviewer may try them. Pick requests your plugin handles reliably with demo data (see <a href={u('/guides/mcp-test-cases/')}>writing test cases</a>).</li>
     <li><strong>No pricing or comparisons.</strong> The same guideline that covers descriptions applies to anything promotional.</li>
   </ul>
 

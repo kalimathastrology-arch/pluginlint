@@ -1,14 +1,17 @@
 ---
 import Base from '../../layouts/Base.astro';
 import { u } from '../../lib/url';
+import { softwareAppLd } from '../../lib/seo';
 const tools = [
   ['/grader/', 'Listing grader', 'Check display name, subtitle, description, starter prompts, capabilities, URLs, brand colours and screenshot sizes against the final-submission limits.'],
   ['/tools/tool-output-privacy-audit/', 'Tool-output privacy auditor', 'Paste real MCP tool results and find PII, session/trace/request IDs, timestamps, secrets, debug data and upsell text — then see what your privacy policy does and doesn’t disclose.'],
   ['/tools/test-case-linter/', 'Test-case linter', 'Paste your tools/list result and draft test cases. Checks the 5 positive + 3 negative rule, tool names and annotations, then generates a schema-valid submission import file.'],
 ];
+const ld = tools.map(([href, name, description]) => softwareAppLd({ name: `PluginLint ${name.toLowerCase()}`, description, url: new URL(u(href), Astro.site).toString() }));
 ---
-<Base title="Free tools for ChatGPT plugin submissions" description="Browser-only tools for ChatGPT plugin developers: listing grader, tool-output privacy auditor and test-case linter. Nothing is uploaded.">
+<Base title="Free Tools for ChatGPT Plugin Submissions" description="Free, browser-only tools for ChatGPT plugin developers: listing grader, MCP tool-output privacy auditor and test-case linter. Nothing is uploaded." jsonLd={ld} crumbName="Tools">
   <h1>Tools</h1>
   <p class="lede">All three run entirely in your browser. Nothing you paste is uploaded, stored or logged.</p>
   {tools.map(([href, t, d]) => <div class="card"><h2 style="margin-top:0"><a href={u(href)}>{t}</a></h2><p>{d}</p></div>)}
+  <p>New to the process? Start with <a href={u('/guides/why-chatgpt-plugin-submissions-get-rejected/')}>why ChatGPT plugin submissions get rejected</a>, or browse all <a href={u('/guides/')}>guides</a>.</p>
 </Base>

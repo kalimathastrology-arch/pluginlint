@@ -1,0 +1,16 @@
+---
+// Visible FAQ section. The same questions/answers are emitted as FAQPage JSON-LD, so markup always matches visible text.
+import { faqLd, ldJson, type Faq } from '../lib/seo';
+interface Props { faqs: Faq[]; heading?: string }
+const { faqs, heading = 'Frequently asked questions' } = Astro.props;
+---
+<section class="faq" aria-labelledby="faq">
+  <h2 id="faq">{heading}</h2>
+  {faqs.map((f) => (
+    <div class="faq-item">
+      <h3>{f.q}</h3>
+      <p>{f.a}</p>
+    </div>
+  ))}
+</section>
+<script type="application/ld+json" set:html={ldJson(faqLd(faqs))} />

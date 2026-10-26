@@ -2,9 +2,10 @@
 import Base from '../../layouts/Base.astro';
 import Sources from '../../components/Sources.astro';
 import { u } from '../../lib/url';
-const ld = { '@context': 'https://schema.org', '@type': 'WebApplication', name: 'PluginLint tool-output privacy auditor', applicationCategory: 'DeveloperApplication', operatingSystem: 'Any (runs in your browser)', offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' } };
+import { softwareAppLd } from '../../lib/seo';
+const ld = softwareAppLd({ name: 'PluginLint tool-output privacy auditor', description: 'Find PII, session/trace/request IDs, timestamps, internal IDs, secrets and upsell text in MCP tool output before ChatGPT plugin review. Runs in-browser.', url: new URL(u('/tools/tool-output-privacy-audit/'), Astro.site).toString() });
 ---
-<Base title="Tool-output privacy auditor for MCP plugins" description="Paste MCP tool-result JSON and find personal data, session/trace/request IDs, timestamps, internal account IDs, secrets, logs and upsell text that can get a ChatGPT plugin rejected. Checks your privacy policy for disclosure. Runs in your browser." jsonLd={ld}>
+<Base title="MCP Tool Output Privacy Auditor" description="Find PII, session/trace/request IDs, timestamps, internal IDs, secrets and upsell text in MCP tool output before ChatGPT plugin review. Runs in-browser." jsonLd={ld} crumbs={[['Tools', '/tools/']]} crumbName="Tool-output privacy auditor">
   <h1>Tool-output privacy auditor</h1>
   <p class="lede">One of the common rejection reasons OpenAI lists for remote MCP plugins is returning user-related data that your privacy policy doesn’t disclose. Paste real tool results and see every field a reviewer may question.</p>
   <p class="card"><strong>Nothing leaves your browser.</strong> Parsing and matching happen in this page. Still, prefer test/demo data over real customer records. <strong>Not legal advice</strong> — this is a pattern-matching aid, not a privacy review.</p>

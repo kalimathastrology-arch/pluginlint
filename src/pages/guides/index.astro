@@ -1,17 +1,15 @@
 ---
 import Base from '../../layouts/Base.astro';
 import { u } from '../../lib/url';
-const guides = [
-  ['/guides/plugin-name-character-limit/', 'Plugin name character limit', 'The 30-character display-name limit, the separate 64-character package name, and the naming guidelines reviewers apply.'],
-  ['/guides/starter-prompts-rules/', 'Starter prompt rules', 'How many starter prompts you can add, the 128-character limit, uniqueness, @mentions, and how to write good ones.'],
-  ['/guides/submission-errors-explained/', 'Submission errors explained', 'The listing-field error codes from OpenAI’s submission-errors page, grouped and translated into fixes.'],
-  ['/guides/undisclosed-data-types-rejection/', 'Fixing the “undisclosed data types” rejection', 'What to remove from tool outputs (session/trace/request IDs, timestamps, internal IDs, logs, secrets) and when to disclose instead.'],
-  ['/guides/mcp-test-cases/', 'Writing the 5 positive + 3 negative test cases', 'Required fields per OpenAI’s submission schema and how to write cases reviewers can verify.'],
-  ['/guides/screenshot-size-requirements/', 'Screenshot size requirements', 'When screenshots are allowed, the 706 px width and 400–860 px height rule, and how to resize.'],
-];
+import { GUIDES } from '../../lib/guides';
+const ld = {
+  '@context': 'https://schema.org', '@type': 'ItemList', name: 'PluginLint guides',
+  itemListElement: GUIDES.map((g, i) => ({ '@type': 'ListItem', position: i + 1, name: g.title, url: new URL(u(`/guides/${g.slug}/`), Astro.site).toString() })),
+};
 ---
-<Base title="Guides" description="Plain-English guides to the ChatGPT plugin directory listing rules: name limits, starter prompts, submission errors and screenshot sizes.">
+<Base title="ChatGPT Plugin Submission Guides" description="Sourced, plain-English guides to ChatGPT plugin submission: rejection reasons, error codes, MCP tool annotations, test cases, name limits, screenshots." jsonLd={ld} crumbName="Guides">
   <h1>Guides</h1>
-  <p class="lede">Short, sourced explanations of the listing rules. Each guide links to the OpenAI page it is based on and shows when it was last checked.</p>
-  {guides.map(([href, t, d]) => <div class="card"><h2 style="margin-top:0"><a href={u(href)}>{t}</a></h2><p>{d}</p></div>)}
+  <p class="lede">Short, sourced explanations of the ChatGPT plugin directory rules. Each guide starts with a one-paragraph answer, links to the OpenAI page it is based on, and shows when it was last checked.</p>
+  {GUIDES.map((g) => <div class="card"><h2 style="margin-top:0"><a href={u(`/guides/${g.slug}/`)}>{g.title}</a></h2><p>{g.blurb}</p></div>)}
+  <p>Prefer to check your own listing? Use the <a href={u('/grader/')}>listing grader</a>, or see every limit on the <a href={u('/rules/')}>rules page</a>.</p>
 </Base>

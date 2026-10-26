@@ -30,6 +30,7 @@ npm ci
 npm test          # vitest: rule functions, grader, auditor, linter, watcher helpers
 npm run dev       # http://localhost:4321/pluginlint/
 npm run build     # static output in dist/
+npm run check     # SEO + link checker over dist/ (titles, descriptions, H1s, canonical, OG, JSON-LD, FAQ visibility, broken links, RSS/sitemap)
 npm run watch-docs  # one request to each of the two docs pages; updates data/ if changed
 ```
 
@@ -79,6 +80,10 @@ Set `ANALYTICS_SCRIPT_URL` to a cookieless analytics script and name the provide
 ## AdSense (later)
 
 See `launch/adsense-checklist.md`. When approved, set `ADSENSE_CLIENT`, add the AdSense script to `src/layouts/Base.astro` (it is intentionally not included yet), add `public/ads.txt`, and update `/privacy` (and a consent banner where required).
+
+## SEO / AEO
+
+See `launch/seo-plan.md`. Titles, descriptions, Open Graph, JSON-LD (WebSite, BreadcrumbList, SoftwareApplication, TechArticle, FAQPage) and `/llms.txt` are generated from `src/lib/` data, so they stay in sync with the rules. Regenerate the social image with `python3 scripts/make-og-image.py`.
 
 ## Launch drafts
 

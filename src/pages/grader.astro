@@ -3,9 +3,10 @@ import Base from '../layouts/Base.astro';
 import Sources from '../components/Sources.astro';
 import { CATEGORIES, LIMITS } from '../lib/rules-data';
 import { u } from '../lib/url';
-const ld = { '@context': 'https://schema.org', '@type': 'WebApplication', name: 'PluginLint listing grader', applicationCategory: 'DeveloperApplication', operatingSystem: 'Any (runs in your browser)', offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' }, description: 'Checks a ChatGPT plugin directory listing against the published OpenAI submission limits. Runs entirely in your browser.' };
+import { softwareAppLd } from '../lib/seo';
+const ld = softwareAppLd({ name: 'PluginLint listing grader', description: 'Checks a ChatGPT plugin directory listing against the published OpenAI final-submission limits. Runs entirely in your browser.', url: new URL(u('/grader/'), Astro.site).toString() });
 ---
-<Base title="ChatGPT plugin listing grader" description="Free, private grader for ChatGPT plugin directory listings: checks name, subtitle, description, starter prompts, capabilities, URLs, brand colours and screenshot sizes against OpenAI's published limits. Runs 100% in your browser." jsonLd={ld}>
+<Base title="ChatGPT Plugin Listing Grader (Free, Private)" description="Free grader for ChatGPT plugin listings: checks name, subtitle, description, starter prompts, capabilities, URLs and colours against OpenAI's limits." jsonLd={ld} crumbName="Listing grader">
   <h1>Plugin listing grader</h1>
   <p class="lede">Paste your listing fields and get a pass / warn / fail report against OpenAI’s published final-submission limits.</p>
   <p class="card"><strong>Private by design:</strong> everything runs in this page with JavaScript. Nothing you type is sent, stored or logged anywhere. You can disconnect from the internet after the page loads and it still works.</p>

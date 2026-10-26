@@ -1,6 +1,7 @@
 ---
 import { SITE_NAME, SITE_TAGLINE, ANALYTICS_SCRIPT_URL } from '../../site.config.mjs';
 import { u } from '../lib/url';
+import { fullTitle as makeTitle, canonicalPath, breadcrumbLd, ldJson } from '../lib/seo';
 import '../styles/global.css';
 
 interface Props {
@@ -8,16 +9,30 @@ interface Props {
   description: string;
   jsonLd?: Record<string, unknown> | Record<string, unknown>[];
   type?: 'website' | 'article';
+  /** Breadcrumb trail between Home and this page, e.g. [['Guides', '/guides/']]. The current page is appended. */
+  crumbs?: [string, string][];
+  /** Short name for this page in the breadcrumb (defaults to the title). */
+  crumbName?: string;
+  noindex?: boolean;
 }
-const { title, description, jsonLd, type = 'website' } = Astro.props;
-const fullTitle = title === SITE_NAME ? `${SITE_NAME} — ${SITE_TAGLINE}` : `${title} | ${SITE_NAME}`;
-const path = Astro.url.pathname.endsWith('/') || Astro.url.pathname.includes('.') ? Astro.url.pathname : `${Astro.url.pathname}/`;
-const canonical = new URL(path, Astro.site).toString();
+const { title, description, jsonLd, type = 'website', crumbs = [], crumbName, noindex = false } = Astro.props;
+const fullTitle = makeTitle(title, SITE_NAME);
+const canonical = new URL(canonicalPath(Astro.url.pathname), Astro.site).toString();
+const abs = (p: string) => new URL(u(p), Astro.site).toString();
+const home = abs('/');
+const ogImage = abs('/og.png');
+const isHome = canonical === home;
+const trail: [string, string][] = isHome || noindex ? [] : [['Home', '/'], ...crumbs];
+const orgLd = { '@type': 'Organization', '@id': `${home}#org`, name: SITE_NAME, url: home, logo: ogImage };
 const siteLd = {
-  '@context': 'https://schema.org', '@type': 'WebSite', name: SITE_NAME,
-  url: new URL(u('/'), Astro.site).toString(), description: SITE_TAGLINE,
+  '@context': 'https://schema.org', '@type': 'WebSite', '@id': `${home}#website`, name: SITE_NAME,
+  url: home, description: SITE_TAGLINE, inLanguage: 'en', publisher: orgLd,
 };
-const ld = [siteLd, ...(jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [])];
+const ld = [
+  siteLd,
+  ...(trail.length ? [breadcrumbLd([...trail.map(([name, p]) => ({ name, url: abs(p) })), { name: crumbName ?? title, url: canonical }])] : []),
+  ...(jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : []),
+];
 const nav = [
   ['/grader/', 'Grader'], ['/tools/', 'Tools'], ['/rules/', 'Rules'], ['/guides/', 'Guides'], ['/about/', 'About'],
 ];
@@ -29,18 +44,27 @@ const nav = [
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
-    <link rel="canonical" href={canonical} />
+    {noindex ? <meta name="robots" content="noindex" /> : <link rel="canonical" href={canonical} />}
     <meta property="og:type" content={type} />
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
     <meta property="og:site_name" content={SITE_NAME} />
-    <meta name="twitter:card" content="summary" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="PluginLint — free, private pre-submission checks for ChatGPT plugin directory listings" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
     <meta name="theme-color" content="#1a56db" />
+    {/* Search Console: when Google gives an HTML-tag token, add <meta name="google-site-verification" content="TOKEN" /> here (see launch/seo-plan.md). */}
     <link rel="icon" href={u('/favicon.svg')} type="image/svg+xml" />
     <link rel="alternate" type="application/rss+xml" title="PluginLint rules changes" href={u('/rss.xml')} />
     <link rel="sitemap" href={u('/sitemap-index.xml')} />
-    <script type="application/ld+json" set:html={JSON.stringify(ld)} />
+    <script type="application/ld+json" set:html={ldJson(ld)} />
     {ANALYTICS_SCRIPT_URL && <script defer src={ANALYTICS_SCRIPT_URL}></script>}
   </head>
   <body>
@@ -54,6 +78,11 @@ const nav = [
       </div>
     </header>
     <main id="main" class="wrap">
+      {trail.length > 0 && (
+        <nav aria-label="Breadcrumb" class="breadcrumb meta">
+          {trail.map(([name, p]) => <><a href={u(p)}>{name}</a> › </>)}<span aria-current="page">{crumbName ?? title}</span>
+        </nav>
+      )}
       <slot />
     </main>
     <footer class="site-footer">
@@ -61,7 +90,8 @@ const nav = [
         <p><strong>PluginLint</strong> is an independent, free project. Not affiliated with, endorsed by, or sponsored by OpenAI. “ChatGPT” and “OpenAI” are trademarks of OpenAI.</p>
         <p>
           <a href={u('/privacy/')}>Privacy</a> · <a href={u('/submit/')}>Submit feedback</a> ·
-          <a href={u('/rss.xml')}>RSS: rules changes</a> · <a href={u('/sitemap-index.xml')}>Sitemap</a>
+          <a href={u('/rss.xml')}>RSS: rules changes</a> · <a href={u('/sitemap-index.xml')}>Sitemap</a> ·
+          <a href={u('/llms.txt')}>llms.txt</a>
         </p>
       </div>
     </footer>

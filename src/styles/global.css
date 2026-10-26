@@ -33,3 +33,6 @@ textarea { min-height:6rem; }
 .score { font-size:2.5rem; font-weight:800; }
 .swatch { display:inline-block; width:1.2rem; height:1.2rem; border:1px solid var(--line); vertical-align:middle; border-radius:3px; }
 .site-footer { border-top:1px solid var(--line); margin-top:3rem; padding:1rem 0 2rem; color:var(--muted); font-size:.9rem; }
+.breadcrumb { margin:0 0 .5rem; } .breadcrumb a { margin:0; }
+.faq-item h3 { font-size:1.05rem; margin:1.25rem 0 .25rem; } .faq-item p { margin:0; }
+.answer { border-left:4px solid var(--accent); padding:.5rem 1rem; background:var(--soft); border-radius:4px; }

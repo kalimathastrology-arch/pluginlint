@@ -2,11 +2,11 @@
 import Guide from '../../layouts/Guide.astro';
 import { u } from '../../lib/url';
 ---
-<Guide title="Writing the 5 positive and 3 negative test cases for a ChatGPT plugin" description="Remote MCP plugin submissions need exactly five positive and three negative test cases. What fields each case needs per OpenAI's submission schema, and how to write cases reviewers can verify." sources={['submissionErrors', 'submissionSchema', 'appReview']}>
+<Guide title="Writing the 5 positive and 3 negative test cases for a ChatGPT plugin" seoTitle="ChatGPT Plugin Review Test Cases (5 + 3)" description="Remote MCP plugins need exactly 5 positive and 3 negative test cases. Required fields per OpenAI's schema, and how to write cases reviewers can verify." summary="a remote MCP plugin needs exactly five positive and three negative test cases plus release notes. Positive cases need description, user_prompt and tools_triggered; negative cases need description and user_prompt. Write prompts a reviewer can run on your demo account and get the result you describe." sources={['submissionErrors', 'submissionSchema', 'appReview']}>
   <p class="lede">The submission reference says a remote MCP plugin needs “exactly five positive test cases, three negative test cases, and release notes”. The review page lists failed test cases as a common rejection reason. Here is how to get them right.</p>
 
   <h2>Fields per case</h2>
-  <p>OpenAI publishes a JSON schema for the submission import file, <a href="https://developers.openai.com/apps-sdk/schemas/chatgpt-app-submission.v1.json" rel="noopener"><code>chatgpt-app-submission.v1.json</code></a>. It defines:</p>
+  <p>OpenAI publishes a JSON schema for the submission import file, <a href="https://developers.openai.com/apps-sdk/schemas/chatgpt-app-submission.v1.json" rel="noopener"><code>chatgpt-app-submission.v1.json</code></a>. (The file name still says “ChatGPT app submission”.) It defines:</p>
   <table>
     <tr><th></th><th>Required</th><th>Optional</th></tr>
     <tr><td>Positive case</td><td><code>description</code> (≤ 4,000 chars), <code>user_prompt</code>, <code>tools_triggered</code></td><td><code>expected_output</code>, <code>expected_output_url</code>, <code>file_attachment_urls</code></td></tr>
@@ -32,6 +32,6 @@ import { u } from '../../lib/url';
     <li><code>tools_triggered</code> naming a tool that isn’t in <code>tools/list</code> (renamed tools are the usual cause).</li>
     <li>Vague prompts such as “test” or “help me”.</li>
     <li><code>@mentions</code> in prompts.</li>
-    <li>Tools without explicit <code>readOnlyHint</code>, <code>openWorldHint</code> and <code>destructiveHint</code>.</li>
+    <li>Tools without explicit <code>readOnlyHint</code>, <code>openWorldHint</code> and <code>destructiveHint</code> (see <a href={u('/guides/mcp-tool-annotations/')}>MCP tool annotations explained</a>).</li>
   </ul>
 </Guide>

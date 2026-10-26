@@ -1,9 +1,9 @@
 ---
 import Guide from '../../layouts/Guide.astro';
 import { LIMITS } from '../../lib/rules-data';
+import { u } from '../../lib/url';
 ---
-<Guide title="ChatGPT plugin screenshot size requirements" description={`Plugin screenshots must be exactly ${LIMITS.screenshotWidth} px wide and ${LIMITS.screenshotMinHeight}–${LIMITS.screenshotMaxHeight} px tall, PNG or JPEG, one per starter prompt — and only for remote MCP plugins with custom UI.`}>
-  <p class="lede">Short answer: if you add screenshots, each must be a PNG or JPEG exactly <strong>{LIMITS.screenshotWidth} pixels wide</strong> and <strong>{LIMITS.screenshotMinHeight}–{LIMITS.screenshotMaxHeight} pixels tall</strong>, with one screenshot for every starter prompt. Most plugins should not add any.</p>
+<Guide title="ChatGPT plugin screenshot size requirements" seoTitle="ChatGPT Plugin Screenshot Size Requirements" description={`Plugin screenshots must be PNG or JPEG, exactly ${LIMITS.screenshotWidth} px wide and ${LIMITS.screenshotMinHeight}–${LIMITS.screenshotMaxHeight} px tall, one per starter prompt — and only for remote MCP plugins with custom UI.`} summary={`if you add screenshots, each must be a PNG or JPEG exactly ${LIMITS.screenshotWidth} pixels wide and ${LIMITS.screenshotMinHeight}–${LIMITS.screenshotMaxHeight} pixels tall, with one per starter prompt. They are only allowed when your remote MCP server provides custom UI, so most plugins should not add any.`}>
 
   <h2>Do you need screenshots at all?</h2>
   <ul>
@@ -19,7 +19,7 @@ import { LIMITS } from '../../lib/rules-data';
     <tr><td>Format</td><td>PNG or JPEG</td></tr>
     <tr><td>Width</td><td>Exactly {LIMITS.screenshotWidth} px</td></tr>
     <tr><td>Height</td><td>{LIMITS.screenshotMinHeight} px to {LIMITS.screenshotMaxHeight} px</td></tr>
-    <tr><td>Count</td><td>One per starter prompt (so at most {LIMITS.starterPromptsMax})</td></tr>
+    <tr><td>Count</td><td>One per starter prompt (so at most {LIMITS.starterPromptsMax}; see <a href={u('/guides/starter-prompts-rules/')}>starter prompt rules</a>)</td></tr>
   </table>
   <p>Retina captures are the classic mistake: a 706-point-wide window captured on a 2× display is a 1,412-pixel image. Scale it down to exactly 706 px wide.</p>
 
@@ -29,7 +29,7 @@ import { LIMITS } from '../../lib/rules-data';
     <li><strong>ImageMagick:</strong> <code>magick shot.png -resize 706x shot-706.png</code>. To force a height into range without distortion, crop or pad: <code>magick shot-706.png -gravity north -extent 706x860 out.png</code>.</li>
     <li><strong>Any image editor:</strong> set the canvas to 706 px wide and an allowed height before exporting.</li>
   </ul>
-  <p>The PluginLint grader can read the dimensions of image files locally (they are not uploaded) and tells you which ones fail.</p>
+  <p>The <a href={u('/grader/')}>PluginLint grader</a> can read the dimensions of image files locally (they are not uploaded) and tells you which ones fail.</p>
 
   <h2>Not the same as branding images</h2>
   <p>Logos and composer icons follow different rules: square, between 48×48 and 4,096×4,096 pixels, up to 5 MiB, in PNG, JPEG, WebP or SVG. The submission reference says these image rules apply to packaged branding assets and that “starter-prompt screenshots use the separate portal limits”.</p>
