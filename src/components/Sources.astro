@@ -1,0 +1,11 @@
+---
+import { SOURCES, LAST_CHECKED, type SourceKey } from '../lib/rules-data';
+interface Props { keys?: SourceKey[] }
+const { keys = ['submissionErrors', 'guidelines'] as SourceKey[] } = Astro.props;
+---
+<aside class="card">
+  <p class="meta"><strong>Last checked:</strong> <time datetime={LAST_CHECKED}>{LAST_CHECKED}</time> against the official OpenAI pages. Limits can change — always confirm in the source before you submit.</p>
+  <ul>
+    {keys.map((k) => <li><a href={SOURCES[k].url} rel="noopener">{SOURCES[k].title}</a></li>)}
+  </ul>
+</aside>

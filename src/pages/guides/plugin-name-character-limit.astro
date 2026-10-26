@@ -1,0 +1,47 @@
+---
+import Guide from '../../layouts/Guide.astro';
+import { LIMITS } from '../../lib/rules-data';
+---
+<Guide title="ChatGPT plugin name character limit (and naming rules)" description={`The display name of a ChatGPT directory plugin must be one line and at most ${LIMITS.displayName} characters at final submission. Here is how the limit works, how it differs from the package name, and what the naming guidelines say.`}>
+  <p class="lede">Short answer: your plugin’s <strong>display name</strong> must be <strong>one line and at most {LIMITS.displayName} characters</strong> for final directory submission.</p>
+
+  <h2>Three different “names”</h2>
+  <p>A plugin package has several name-like fields, and they have different limits. Mixing them up is the most common source of confusion.</p>
+  <table>
+    <tr><th>Field</th><th>Where it lives</th><th>Limit</th></tr>
+    <tr><td>Display name</td><td><code>interface.displayName</code> in <code>.codex-plugin/plugin.json</code></td><td>Final submission: {LIMITS.displayName} characters, one line. Package validation: {LIMITS.pkgDisplayName}.</td></tr>
+    <tr><td>Package name</td><td><code>name</code> in the manifest</td><td>{LIMITS.packageName} characters. Must start with an ASCII letter or digit and use only ASCII letters, digits, <code>_</code> and <code>-</code>.</td></tr>
+    <tr><td>Short description (subtitle)</td><td><code>interface.shortDescription</code></td><td>Final submission: {LIMITS.subtitle} characters, one line. Package validation: {LIMITS.pkgShortDescription}.</td></tr>
+  </table>
+  <p>The package name is the machine identifier (think <code>acme-ledger</code>). The display name is what people see in the directory (think “Acme Ledger”). An update must keep the same package name as the existing plugin (<code>plugin_name_mismatch</code>).</p>
+
+  <h2>Why your upload passed but submission failed</h2>
+  <p>OpenAI validates twice. The upload check accepts a display name of up to {LIMITS.pkgDisplayName} characters, but final directory submission only accepts {LIMITS.displayName}. If your name is, say, 42 characters long, the ZIP uploads fine and then <code>submission_display_name_too_long</code> blocks the final step. Write to the {LIMITS.displayName}-character limit from the start.</p>
+
+  <h2>Related errors</h2>
+  <ul>
+    <li><code>submission_display_name_required</code> — empty, only whitespace, or not a single line.</li>
+    <li><code>submission_display_name_too_long</code> — more than {LIMITS.displayName} characters.</li>
+    <li><code>submission_display_name_character_unsupported</code> — contains control characters, Unicode line/paragraph separators or invisible formatting characters. These often sneak in when you copy text from a design tool or a document; retype the name or paste it as plain text.</li>
+  </ul>
+
+  <h2>What counts as a character?</h2>
+  <p>OpenAI’s page says “characters” without defining how emoji or combined characters are counted. PluginLint counts Unicode code points, which matches what most people expect for plain text. If your name uses emoji or accented letters built from several code points, leave yourself a few characters of headroom.</p>
+
+  <h2>Naming guidelines reviewers apply</h2>
+  <p>Beyond the hard limit, the plugin guidelines ask for names that are “clear, accurate, and straightforward”, and say:</p>
+  <ul>
+    <li><strong>Avoid overly generic names</strong>, especially single-word dictionary terms that aren’t tied to your brand. “Notes” or “Calendar” on its own is likely to be questioned; “Acme Notes” is clearer.</li>
+    <li><strong>Don’t append “MCP”, “MCP Server” or “Plugin”</strong> to a company or product name. Use “Acme”, not “Acme MCP” or “Acme Plugin”.</li>
+    <li><strong>Don’t imply OpenAI made or endorsed it.</strong> Words like “official” deserve a second look.</li>
+  </ul>
+  <p>These are review guidelines, not automated error codes, so the PluginLint grader shows them as <em>warnings</em> for you to judge.</p>
+
+  <h2>Fitting a name into 30 characters</h2>
+  <ol>
+    <li>Start with your brand or product name; that is what users search for.</li>
+    <li>Only add a word of function if the brand alone is ambiguous (“Acme Ledger” rather than “Acme”).</li>
+    <li>Move the explanation to the subtitle ({LIMITS.subtitle} characters) and long description ({LIMITS.longDescription.toLocaleString('en-US')} characters).</li>
+    <li>Drop filler like “for ChatGPT”, “AI”, “MCP” or “Plugin”.</li>
+  </ol>
+</Guide>

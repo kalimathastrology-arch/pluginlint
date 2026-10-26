@@ -1,0 +1,28 @@
+{
+  "name": "pluginlint",
+  "version": "1.0.0",
+  "description": "Free static toolkit for ChatGPT plugin directory listings",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "test": "vitest run",
+    "watch-docs": "node scripts/watch-docs.mjs"
+  },
+  "author": "",
+  "license": "MIT",
+  "type": "module",
+  "dependencies": {
+    "@astrojs/rss": "^4.0.19",
+    "@astrojs/sitemap": "^3.7.4",
+    "astro": "^5.18.2"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.12"
+  },
+  "private": true,
+  "engines": {
+    "node": ">=20.19.1"
+  }
+}

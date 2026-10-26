@@ -1,0 +1,36 @@
+---
+import Guide from '../../layouts/Guide.astro';
+import { LIMITS } from '../../lib/rules-data';
+---
+<Guide title="ChatGPT plugin screenshot size requirements" description={`Plugin screenshots must be exactly ${LIMITS.screenshotWidth} px wide and ${LIMITS.screenshotMinHeight}–${LIMITS.screenshotMaxHeight} px tall, PNG or JPEG, one per starter prompt — and only for remote MCP plugins with custom UI.`}>
+  <p class="lede">Short answer: if you add screenshots, each must be a PNG or JPEG exactly <strong>{LIMITS.screenshotWidth} pixels wide</strong> and <strong>{LIMITS.screenshotMinHeight}–{LIMITS.screenshotMaxHeight} pixels tall</strong>, with one screenshot for every starter prompt. Most plugins should not add any.</p>
+
+  <h2>Do you need screenshots at all?</h2>
+  <ul>
+    <li>The plugin guidelines say: “Screenshots are no longer shown in the Directory, instead provide example Prompts that help users get started with your plugin.”</li>
+    <li>The submission reference says screenshots are for a remote MCP plugin “only when the MCP server provides custom UI”. The <code>screenshots_not_allowed</code> error fires if the current tool scan reports no UI output template.</li>
+    <li>Skills-only ZIP uploads must not include <code>interface.screenshots</code> at all (<code>screenshot_configuration_excluded</code>).</li>
+    <li>The review page adds: “Don't provide screenshots when the plugin has no UI.”</li>
+  </ul>
+
+  <h2>The size rule</h2>
+  <table>
+    <tr><th>Property</th><th>Requirement</th></tr>
+    <tr><td>Format</td><td>PNG or JPEG</td></tr>
+    <tr><td>Width</td><td>Exactly {LIMITS.screenshotWidth} px</td></tr>
+    <tr><td>Height</td><td>{LIMITS.screenshotMinHeight} px to {LIMITS.screenshotMaxHeight} px</td></tr>
+    <tr><td>Count</td><td>One per starter prompt (so at most {LIMITS.starterPromptsMax})</td></tr>
+  </table>
+  <p>Retina captures are the classic mistake: a 706-point-wide window captured on a 2× display is a 1,412-pixel image. Scale it down to exactly 706 px wide.</p>
+
+  <h2>How to resize</h2>
+  <ul>
+    <li><strong>macOS:</strong> <code>sips --resampleWidth 706 shot.png</code>, then check the height is 400–860 px.</li>
+    <li><strong>ImageMagick:</strong> <code>magick shot.png -resize 706x shot-706.png</code>. To force a height into range without distortion, crop or pad: <code>magick shot-706.png -gravity north -extent 706x860 out.png</code>.</li>
+    <li><strong>Any image editor:</strong> set the canvas to 706 px wide and an allowed height before exporting.</li>
+  </ul>
+  <p>The PluginLint grader can read the dimensions of image files locally (they are not uploaded) and tells you which ones fail.</p>
+
+  <h2>Not the same as branding images</h2>
+  <p>Logos and composer icons follow different rules: square, between 48×48 and 4,096×4,096 pixels, up to 5 MiB, in PNG, JPEG, WebP or SVG. The submission reference says these image rules apply to packaged branding assets and that “starter-prompt screenshots use the separate portal limits”.</p>
+</Guide>

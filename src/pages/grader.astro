@@ -1,0 +1,145 @@
+---
+import Base from '../layouts/Base.astro';
+import Sources from '../components/Sources.astro';
+import { CATEGORIES, LIMITS } from '../lib/rules-data';
+import { u } from '../lib/url';
+const ld = { '@context': 'https://schema.org', '@type': 'WebApplication', name: 'PluginLint listing grader', applicationCategory: 'DeveloperApplication', operatingSystem: 'Any (runs in your browser)', offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' }, description: 'Checks a ChatGPT plugin directory listing against the published OpenAI submission limits. Runs entirely in your browser.' };
+---
+<Base title="ChatGPT plugin listing grader" description="Free, private grader for ChatGPT plugin directory listings: checks name, subtitle, description, starter prompts, capabilities, URLs, brand colours and screenshot sizes against OpenAI's published limits. Runs 100% in your browser." jsonLd={ld}>
+  <h1>Plugin listing grader</h1>
+  <p class="lede">Paste your listing fields and get a pass / warn / fail report against OpenAI’s published final-submission limits.</p>
+  <p class="card"><strong>Private by design:</strong> everything runs in this page with JavaScript. Nothing you type is sent, stored or logged anywhere. You can disconnect from the internet after the page loads and it still works.</p>
+
+  <form id="grader" autocomplete="off" onsubmit="return false">
+    <label>Submission type
+      <select name="submissionType">
+        <option value="mcp">Remote MCP plugin (“With MCP”)</option>
+        <option value="skills">Skills-only ZIP upload</option>
+      </select>
+    </label>
+    <div class="grid2">
+      <label>Display name <span class="counter" data-for="displayName" data-max={LIMITS.displayName}></span>
+        <input type="text" name="displayName" placeholder="Acme Ledger" /></label>
+      <label>Subtitle (short description) <span class="counter" data-for="subtitle" data-max={LIMITS.subtitle}></span>
+        <input type="text" name="subtitle" placeholder="Track invoices in chat" /></label>
+    </div>
+    <label>Long description <span class="counter" data-for="longDescription" data-max={LIMITS.longDescription}></span>
+      <textarea name="longDescription" rows="6"></textarea></label>
+    <div class="grid2">
+      <label>Developer name <span class="counter" data-for="developerName" data-max={LIMITS.developerName}></span>
+        <input type="text" name="developerName" /></label>
+      <label>Category
+        <select name="category"><option value="">— choose —</option>{CATEGORIES.map((c) => <option value={c}>{c}</option>)}</select></label>
+    </div>
+    <label>Starter prompts <span class="hint">one per line (max {LIMITS.starterPromptsMax}, each ≤ {LIMITS.starterPrompt} characters)</span>
+      <textarea name="starterPrompts" rows="4"></textarea></label>
+    <label>Capabilities <span class="hint">one per line (max {LIMITS.capabilitiesMax}, each ≤ {LIMITS.capability} characters)</span>
+      <textarea name="capabilities" rows="5"></textarea></label>
+    <div class="grid2">
+      <label>Website URL <input type="url" name="websiteUrl" placeholder="https://" /></label>
+      <label>Support URL <input type="url" name="supportUrl" placeholder="https://" /></label>
+      <label>Privacy policy URL <input type="url" name="privacyUrl" placeholder="https://" /></label>
+      <label>Terms of service URL <input type="url" name="termsUrl" placeholder="https://" /></label>
+      <label>Brand colour (light) <span class="hint">checked against white #FFFFFF</span>
+        <input type="text" name="brandColor" placeholder="#1A56DB" /> <span class="swatch" data-swatch="brandColor"></span></label>
+      <label>Brand colour (dark) <span class="hint">checked against #212121</span>
+        <input type="text" name="brandColorDark" placeholder="#7FB2FF" /> <span class="swatch" data-swatch="brandColorDark"></span></label>
+    </div>
+    <label><input type="checkbox" name="hasCustomUi" /> My MCP server provides custom UI (a UI output template)</label>
+    <label>Screenshot sizes (optional) <span class="hint">one per line, e.g. 706x500 — or pick image files below (read locally, never uploaded)</span>
+      <textarea name="screenshots" rows="3"></textarea></label>
+    <input type="file" id="shotFiles" accept="image/png,image/jpeg" multiple />
+    <p><button class="btn" id="run" type="button">Grade my listing</button> <button class="btn secondary" id="sample" type="button">Load an example</button> <button class="btn secondary" id="clear" type="button">Clear</button></p>
+  </form>
+
+  <section id="out" hidden aria-live="polite">
+    <h2>Result</h2>
+    <p><span class="score" id="score"></span> <span id="summary" class="meta"></span></p>
+    <p><button class="btn" id="copy" type="button">Copy result</button> <span id="copied" class="meta"></span></p>
+    <ul class="results" id="list"></ul>
+    <p class="meta">Items marked <em>heuristic</em> are keyword-based warnings from the review guidelines, not automated submission errors. A human reviewer makes the final call.</p>
+  </section>
+
+  <h2>What this checks</h2>
+  <p>The hard limits come from OpenAI’s <em>Final directory submission</em> table; the wording warnings come from the plugin guidelines. See the full <a href={u('/rules/')}>rules reference</a>. It does not check things only OpenAI can see: tool scans, domain verification, skill scans, test cases or identity verification.</p>
+  <Sources />
+
+  <script>
+    import { gradeListing, formatReport, type ListingInput } from '../lib/grader';
+    import { charLen, isSixDigitHex } from '../lib/rules';
+
+    const form = document.getElementById('grader') as HTMLFormElement;
+    const val = (n: string) => ((form.elements.namedItem(n) as HTMLInputElement | null)?.value ?? '');
+    const lines = (n: string) => val(n).split(/\r?\n/).filter((l) => l.length > 0);
+    let lastReport = '';
+
+    function read(): ListingInput {
+      return {
+        submissionType: val('submissionType') as 'mcp' | 'skills',
+        displayName: val('displayName'), subtitle: val('subtitle'), longDescription: val('longDescription'),
+        developerName: val('developerName'), category: val('category'),
+        starterPrompts: lines('starterPrompts'), capabilities: lines('capabilities'),
+        websiteUrl: val('websiteUrl'), supportUrl: val('supportUrl'), privacyUrl: val('privacyUrl'), termsUrl: val('termsUrl'),
+        brandColor: val('brandColor'), brandColorDark: val('brandColorDark'),
+        hasCustomUi: (form.elements.namedItem('hasCustomUi') as HTMLInputElement).checked,
+        screenshots: val('screenshots'),
+      };
+    }
+
+    function updateCounters() {
+      document.querySelectorAll<HTMLElement>('.counter').forEach((el) => {
+        const n = charLen(val(el.dataset.for!)); const max = +el.dataset.max!;
+        el.textContent = `${n}/${max}`; el.classList.toggle('over', n > max);
+      });
+      document.querySelectorAll<HTMLElement>('[data-swatch]').forEach((el) => {
+        const v = val(el.dataset.swatch!).trim(); el.style.background = isSixDigitHex(v) ? v : 'transparent';
+      });
+    }
+
+    function run() {
+      const r = gradeListing(read());
+      const out = document.getElementById('out')!; out.hidden = false;
+      document.getElementById('score')!.textContent = `${r.score}/100`;
+      document.getElementById('summary')!.textContent = `${r.counts.fail} fail · ${r.counts.warn} warn · ${r.counts.pass} pass${r.counts.fail ? ' — fix the failures before submitting' : ''}`;
+      const list = document.getElementById('list')!; list.innerHTML = '';
+      const order = { fail: 0, warn: 1, pass: 2 } as const;
+      [...r.checks].sort((a, b) => order[a.status] - order[b.status]).forEach((c) => {
+        const li = document.createElement('li'); li.className = c.status;
+        const tag = document.createElement('span'); tag.className = `tag ${c.status}`; tag.textContent = c.status.toUpperCase();
+        const strong = document.createElement('strong'); strong.textContent = `${c.field}: `;
+        li.append(tag, strong, document.createTextNode(c.message + (c.heuristic ? ' (heuristic)' : '')));
+        if (c.fix && c.status !== 'pass') { const f = document.createElement('div'); f.className = 'meta'; f.textContent = `Fix: ${c.fix}`; li.append(f); }
+        list.append(li);
+      });
+      lastReport = formatReport(r, val('displayName'));
+      out.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    document.getElementById('run')!.addEventListener('click', run);
+    document.getElementById('copy')!.addEventListener('click', async () => {
+      const msg = document.getElementById('copied')!;
+      try { await navigator.clipboard.writeText(lastReport); msg.textContent = 'Copied.'; }
+      catch { msg.textContent = 'Copy failed — select the text manually.'; }
+    });
+    document.getElementById('clear')!.addEventListener('click', () => { form.reset(); updateCounters(); document.getElementById('out')!.hidden = true; });
+    document.getElementById('sample')!.addEventListener('click', () => {
+      const set = (n: string, v: string) => { (form.elements.namedItem(n) as HTMLInputElement).value = v; };
+      set('displayName', 'Acme Ledger Plugin'); set('subtitle', 'Best invoice tool, free trial!');
+      set('longDescription', 'Acme Ledger lets you look up invoices, payment status and customer balances from your Acme account without leaving the conversation.');
+      set('developerName', 'Acme Labs'); set('category', 'Finance');
+      set('starterPrompts', 'Show unpaid invoices from last month\nShow unpaid invoices  from last month\nAsk @acme to email the overdue list');
+      set('capabilities', 'Look up invoices\nCheck payment status');
+      set('websiteUrl', 'https://acme.example'); set('supportUrl', 'https://acme.example/support');
+      set('privacyUrl', 'http://acme.example/privacy'); set('termsUrl', '');
+      set('brandColor', '#FFD54F'); set('brandColorDark', '#7FB2FF');
+      updateCounters(); run();
+    });
+    document.getElementById('shotFiles')!.addEventListener('change', async (e) => {
+      const files = [...((e.target as HTMLInputElement).files ?? [])];
+      const sizes = await Promise.all(files.map((f) => createImageBitmap(f).then((b) => `${b.width}x${b.height}`).catch(() => `unreadable (${f.name})`)));
+      (form.elements.namedItem('screenshots') as HTMLTextAreaElement).value = sizes.join('\n');
+    });
+    form.addEventListener('input', updateCounters);
+    updateCounters();
+  </script>
+</Base>

@@ -1,0 +1,54 @@
+name: Build and deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  # Commits pushed by the watcher (using GITHUB_TOKEN) do not trigger `push`,
+  # so rebuild after each successful watcher run instead.
+  workflow_run:
+    workflows: ['Watch OpenAI plugin docs']
+    types: [completed]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    env:
+      # Override with repository variables SITE_URL / BASE_PATH (Settings → Secrets and variables → Actions → Variables)
+      # when you move to a custom domain (SITE_URL=https://yourdomain, BASE_PATH=/).
+      SITE_URL: ${{ vars.SITE_URL || format('https://{0}.github.io', github.repository_owner) }}
+      BASE_PATH: ${{ vars.BASE_PATH || format('/{0}', github.event.repository.name) }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

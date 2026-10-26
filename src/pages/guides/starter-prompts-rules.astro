@@ -1,0 +1,44 @@
+---
+import Guide from '../../layouts/Guide.astro';
+import { LIMITS } from '../../lib/rules-data';
+---
+<Guide title="ChatGPT plugin starter prompt rules" description={`Starter prompts for a ChatGPT directory plugin: at most ${LIMITS.starterPromptsMax}, each one line and ≤ ${LIMITS.starterPrompt} characters, unique after normalisation, with no MCP server @mentions. Rules, error codes and writing tips.`}>
+  <p class="lede">Starter prompts (the <code>interface.defaultPrompt</code> field) are the example requests shown with your listing. The guidelines say screenshots are no longer shown in the Directory and that you should instead provide example prompts that help users get started — so these few lines matter.</p>
+
+  <h2>The rules</h2>
+  <table>
+    <tr><th>Rule</th><th>Final submission</th><th>Error code</th></tr>
+    <tr><td>How many</td><td>At most {LIMITS.starterPromptsMax}</td><td><code>plugin_default_prompt_too_many</code></td></tr>
+    <tr><td>Length</td><td>At most {LIMITS.starterPrompt} characters each (package validation allows {LIMITS.pkgStarterPrompt})</td><td><code>plugin_default_prompt_too_long</code></td></tr>
+    <tr><td>Not empty</td><td>Each prompt must be non-empty (not only whitespace)</td><td><code>plugin_default_prompt_empty</code></td></tr>
+    <tr><td>One line, supported text</td><td>No line breaks or invisible/control characters</td><td><code>plugin_default_prompt_character_unsupported</code></td></tr>
+    <tr><td>Unique</td><td>Unique after Unicode and whitespace normalisation</td><td><code>plugin_default_prompt_duplicate</code></td></tr>
+    <tr><td>No @mentions</td><td>Must not contain an MCP server <code>@mention</code></td><td><code>plugin_default_prompt_mention</code></td></tr>
+    <tr><td>Type</td><td>A string or a list of strings</td><td><code>plugin_default_prompt_wrong_type</code></td></tr>
+  </table>
+
+  <h2>What “unique after normalisation” means</h2>
+  <p>Two prompts that only differ in spacing or in Unicode form count as duplicates. For example <code>Find flights to Goa</code> and <code>Find&nbsp;&nbsp;flights to Goa</code> (extra space) are the same prompt. Full-width letters and other compatibility characters may also collapse to the same text. PluginLint normalises with Unicode NFKC and collapses whitespace to catch these; it also warns when prompts differ only by capital letters, since that is not a meaningfully different example even if it might pass.</p>
+
+  <h2>Why no @mentions?</h2>
+  <p>A prompt like “Ask @acme to list my invoices” names an MCP server directly. The submission check rejects these. Write the task the way a user would naturally ask: “List my unpaid invoices from last month.”</p>
+
+  <h2>Screenshots and prompts</h2>
+  <p>If your remote MCP plugin has custom UI and you add screenshots, you must provide one screenshot for every starter prompt. See <a href="../screenshot-size-requirements/">screenshot size requirements</a>.</p>
+
+  <h2>Writing prompts that work</h2>
+  <ul>
+    <li><strong>Cover three different jobs.</strong> Use each slot for a distinct use case rather than three phrasings of one.</li>
+    <li><strong>Be concrete.</strong> “Summarise yesterday’s support tickets tagged billing” teaches more than “Help with support”.</li>
+    <li><strong>Stay well under {LIMITS.starterPrompt} characters.</strong> Short prompts are easier to scan.</li>
+    <li><strong>Make them succeed.</strong> A reviewer may try them. Pick requests your plugin handles reliably with demo data.</li>
+    <li><strong>No pricing or comparisons.</strong> The same guideline that covers descriptions applies to anything promotional.</li>
+  </ul>
+
+  <h2>Example</h2>
+  <pre><code>{`"defaultPrompt": [
+  "Show my unpaid invoices from last month",
+  "Draft a reminder email for invoice INV-1042",
+  "Which customers paid late this quarter?"
+]`}</code></pre>
+</Guide>

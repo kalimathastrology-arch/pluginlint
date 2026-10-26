@@ -1,0 +1,115 @@
+---
+import Base from '../../layouts/Base.astro';
+import Sources from '../../components/Sources.astro';
+import { u } from '../../lib/url';
+const ld = { '@context': 'https://schema.org', '@type': 'WebApplication', name: 'PluginLint test-case linter', applicationCategory: 'DeveloperApplication', operatingSystem: 'Any (runs in your browser)', offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' } };
+const exampleDraft = JSON.stringify({
+  test_cases: [
+    { description: 'Lists unpaid invoices', user_prompt: 'Show my unpaid invoices from last month', tools_triggered: 'search_invoices', expected_output: 'A list of unpaid invoices dated last month with number, customer and amount.' },
+  ],
+  negative_test_cases: [
+    { description: 'Unrelated weather question should not use the plugin', user_prompt: 'What is the weather in Pune tomorrow?' },
+  ],
+  justifications: {
+    search_invoices: { read_only_justification: 'Only reads invoices.', open_world_justification: 'Limited to the user’s own Acme account.', destructive_justification: 'Does not change anything.' },
+  },
+}, null, 2);
+---
+<Base title="MCP plugin test-case linter (5 positive + 3 negative)" description="Paste your MCP tools/list result and draft test cases. Checks exactly 5 positive and 3 negative cases, required fields, tool names, annotations, state-changing tools and vague prompts, then outputs a schema-valid chatgpt-app-submission.json. Runs in your browser." jsonLd={ld}>
+  <h1>Test-case linter</h1>
+  <p class="lede">For remote MCP plugins, OpenAI’s submission-errors page requires “exactly five positive test cases, three negative test cases, and release notes”. This tool checks your draft and produces an import file shaped to OpenAI’s public <code>chatgpt-app-submission.v1.json</code> schema.</p>
+  <p class="card"><strong>Nothing leaves your browser.</strong> The schema check runs locally against a copy of the public schema fetched on 2026-10-26.</p>
+
+  <form onsubmit="return false">
+    <label>tools/list result <span class="hint">the JSON-RPC response, its <code>result</code>, or a bare array of tools</span>
+      <textarea id="tools" rows="8" spellcheck="false" style="font-family:ui-monospace,monospace"></textarea></label>
+    <label>Draft test cases <span class="hint">JSON with <code>test_cases</code>, <code>negative_test_cases</code> and optional <code>justifications</code> keyed by tool name, <code>app_info</code></span>
+      <textarea id="draft" rows="14" spellcheck="false" style="font-family:ui-monospace,monospace" placeholder={exampleDraft}></textarea></label>
+    <p><button class="btn" id="run" type="button">Lint</button> <button class="btn secondary" id="sample" type="button">Load an example</button></p>
+  </form>
+  <p id="err" class="meta" style="color:var(--fail)"></p>
+
+  <section id="out" hidden aria-live="polite">
+    <h2>Pass / fail sheet</h2>
+    <p id="summary"></p>
+    <ul class="results" id="list"></ul>
+    <p><button class="btn" id="print" type="button">Print sheet</button> <button class="btn secondary" id="dl" type="button">Download chatgpt-app-submission.json</button> <button class="btn secondary" id="copy" type="button">Copy JSON</button> <span id="copied" class="meta"></span></p>
+    <h2>Generated JSON</h2>
+    <textarea id="json" rows="16" readonly style="font-family:ui-monospace,monospace"></textarea>
+  </section>
+
+  <h2>What it checks</h2>
+  <ul>
+    <li>Exactly 5 positive and 3 negative test cases (the schema itself says “at least” — <code>minItems</code> 5 and 3 — but the submission page says exactly).</li>
+    <li>Required fields from the schema: positive cases need <code>description</code>, <code>user_prompt</code>, <code>tools_triggered</code>; negative cases need <code>description</code> and <code>user_prompt</code>. Positive descriptions are capped at 4,000 characters.</li>
+    <li>Every name in <code>tools_triggered</code> exists in your tools/list.</li>
+    <li>Each tool has explicit boolean <code>readOnlyHint</code>, <code>openWorldHint</code> and <code>destructiveHint</code>.</li>
+    <li>Warnings: positive cases that call state-changing tools, vague or very short prompts, <code>@mentions</code>, missing expected output, duplicate prompts, negative cases that list tools.</li>
+    <li>Justifications: the schema requires three justification strings per tool, while the current plugin guidelines say annotation justifications are no longer required. To stay schema-valid the file gets “TODO” placeholders — replace them or remove them if the portal no longer asks.</li>
+  </ul>
+  <p>Read the guide: <a href={u('/guides/mcp-test-cases/')}>Writing the 5 positive and 3 negative test cases</a>.</p>
+  <Sources keys={['submissionErrors', 'submissionSchema', 'appReview', 'guidelines']} />
+
+  <style is:global>
+    @media print { .site-header, .site-footer, form, #out button, #out textarea, #out h2:last-of-type, .card, aside, h2, ul:not(.results), p:not(#summary) { display: none !important; } #out { display: block !important; } }
+  </style>
+
+  <script>
+    import { lint, parseToolsList } from '../../lib/test-case-linter';
+    const $ = (id: string) => document.getElementById(id)!;
+    let json = '';
+    const sampleTools = { jsonrpc: '2.0', id: 1, result: { tools: [
+      { name: 'search_invoices', description: 'Search the user’s invoices by date, status or customer.', annotations: { readOnlyHint: true, openWorldHint: false, destructiveHint: false } },
+      { name: 'send_reminder', description: 'Email a payment reminder for one invoice.', annotations: { readOnlyHint: false, openWorldHint: true } },
+    ] } };
+    const sampleDraft = {
+      test_cases: [
+        { description: 'Lists unpaid invoices', user_prompt: 'Show my unpaid invoices from last month', tools_triggered: 'search_invoices', expected_output: 'Unpaid invoices dated last month.' },
+        { description: 'Finds one invoice', user_prompt: 'Find invoice INV-1042 and tell me its status', tools_triggered: 'search_invoices', expected_output: 'INV-1042 status.' },
+        { description: 'Sends reminder', user_prompt: 'Send a reminder for invoice INV-1042', tools_triggered: 'send_reminder', expected_output: 'Confirmation that one reminder email was sent.' },
+        { description: 'Vague', user_prompt: 'test', tools_triggered: 'search_invoices' },
+      ],
+      negative_test_cases: [
+        { description: 'Weather', user_prompt: 'What is the weather in Pune tomorrow?' },
+        { description: 'Mention', user_prompt: 'Ask @acme to write me a poem' },
+        { description: 'General knowledge', user_prompt: 'Explain what an invoice is in general terms', tools_triggered: 'search_invoices' },
+      ],
+      justifications: { search_invoices: { read_only_justification: 'Only reads invoices.', open_world_justification: 'Limited to the user’s own account.', destructive_justification: 'Changes nothing.' } },
+    };
+    $('sample').addEventListener('click', () => {
+      ($('tools') as HTMLTextAreaElement).value = JSON.stringify(sampleTools, null, 2);
+      ($('draft') as HTMLTextAreaElement).value = JSON.stringify(sampleDraft, null, 2);
+      run();
+    });
+    function run() {
+      $('err').textContent = '';
+      let tools, draft;
+      try { tools = parseToolsList(($('tools') as HTMLTextAreaElement).value); } catch (e) { $('err').textContent = `tools/list: ${(e as Error).message}`; return; }
+      try { draft = JSON.parse(($('draft') as HTMLTextAreaElement).value || '{}'); } catch (e) { $('err').textContent = `Draft test cases: ${(e as Error).message}`; return; }
+      const r = lint(tools, draft);
+      $('out').hidden = false;
+      const c = { pass: 0, warn: 0, fail: 0 }; r.items.forEach((i) => c[i.status]++);
+      $('summary').textContent = `${c.fail} fail · ${c.warn} warn · ${c.pass} pass — ${tools.length} tool(s). ${c.fail ? 'Not ready to submit.' : 'No blocking problems found.'}`;
+      const list = $('list'); list.innerHTML = '';
+      const order = { fail: 0, warn: 1, pass: 2 } as const;
+      [...r.items].sort((a, b) => order[a.status] - order[b.status]).forEach((i) => {
+        const li = document.createElement('li'); li.className = i.status;
+        const tag = document.createElement('span'); tag.className = `tag ${i.status}`; tag.textContent = i.status.toUpperCase();
+        const b = document.createElement('strong'); b.textContent = `${i.where}: `;
+        li.append(tag, b, document.createTextNode(i.message));
+        if (i.fix && i.status !== 'pass') { const f = document.createElement('div'); f.className = 'meta'; f.textContent = `Fix: ${i.fix}`; li.append(f); }
+        list.append(li);
+      });
+      json = JSON.stringify(r.output, null, 2);
+      ($('json') as HTMLTextAreaElement).value = json;
+    }
+    $('run').addEventListener('click', run);
+    $('print').addEventListener('click', () => window.print());
+    $('copy').addEventListener('click', async () => { try { await navigator.clipboard.writeText(json); $('copied').textContent = 'Copied.'; } catch { $('copied').textContent = 'Copy failed.'; } });
+    $('dl').addEventListener('click', () => {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([json], { type: 'application/json' }));
+      a.download = 'chatgpt-app-submission.json'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    });
+  </script>
+</Base>

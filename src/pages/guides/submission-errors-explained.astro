@@ -1,0 +1,73 @@
+---
+import Guide from '../../layouts/Guide.astro';
+import { LIMITS, CATEGORIES } from '../../lib/rules-data';
+---
+<Guide title="ChatGPT plugin submission errors explained" description="A plain-English walk-through of OpenAI's plugin submission-errors reference: errors vs warnings, the final-submission listing limits, metadata error codes, URL and brand-colour errors, and what remote MCP plugins additionally need." sources={['submissionErrors', 'guidelines', 'appReview']}>
+  <p class="lede">OpenAI’s <a href="https://developers.openai.com/plugins/deploy/submission-errors" rel="noopener">submission-errors reference</a> lists well over a hundred error codes. Most of them are about ZIP structure and manifests. This guide focuses on the ones that trip people up when filling in the listing, and explains what to do about each.</p>
+
+  <h2>Errors block, warnings don’t</h2>
+  <p>The reference states that errors block submission, while warnings don’t block submission but should be reviewed. It also notes that a package “can pass upload validation and still fail final directory submission”, because final submission uses stricter listing limits and adds MCP configuration, skill scans, test cases and policy attestations.</p>
+
+  <h2>Three rules that apply to every text field</h2>
+  <ul>
+    <li><strong>No whitespace-only values.</strong> A field with only spaces counts as empty.</li>
+    <li><strong>Supported text only.</strong> Control characters, Unicode line or paragraph separators, and unsupported invisible formatting characters are rejected (the <code>…_character_unsupported</code> errors). Copying from rich-text editors is the usual culprit.</li>
+    <li><strong>Clean HTTPS URLs.</strong> URLs need a host and must not contain embedded credentials or unsupported characters.</li>
+  </ul>
+
+  <h2>Final-submission listing limits</h2>
+  <table>
+    <tr><th>Field</th><th>Rule</th></tr>
+    <tr><td>Package name</td><td>Required; at most {LIMITS.packageName} characters; starts with an ASCII letter or digit; only ASCII letters, digits, <code>_</code> and <code>-</code>.</td></tr>
+    <tr><td>Version</td><td>Required semantic version, at most 64 characters. A new release must use a different version.</td></tr>
+    <tr><td>Display name</td><td>Required; one line; at most {LIMITS.displayName} characters.</td></tr>
+    <tr><td>Short description</td><td>Required; one line; at most {LIMITS.subtitle} characters.</td></tr>
+    <tr><td>Long description</td><td>Required; at most {LIMITS.longDescription.toLocaleString('en-US')} characters; line breaks allowed.</td></tr>
+    <tr><td>Developer name</td><td>Required; one line; at most {LIMITS.developerName} characters.</td></tr>
+    <tr><td>Category</td><td>Required; one of: {CATEGORIES.join(', ')}.</td></tr>
+    <tr><td>Capabilities</td><td>At most {LIMITS.capabilitiesMax}; each non-empty, one line, at most {LIMITS.capability} characters.</td></tr>
+    <tr><td>Starter prompts</td><td>At most {LIMITS.starterPromptsMax}; each non-empty, unique after Unicode and whitespace normalisation, one line, at most {LIMITS.starterPrompt} characters, no MCP server <code>@mention</code>.</td></tr>
+    <tr><td>URLs</td><td>Required for remote MCP submissions; optional for skills-only ZIP uploads. Website, support, privacy policy and terms must use HTTPS and be at most {LIMITS.url.toLocaleString('en-US')} characters.</td></tr>
+    <tr><td>Brand colours</td><td>Optional six-digit hex. Light colour ≥ 2:1 contrast against white; dark colour ≥ 2:1 contrast against <code>#212121</code>.</td></tr>
+  </table>
+
+  <h2>The metadata error codes, translated</h2>
+  <p>The reference notes that in these error names, “<code>subtitle</code> means short description and <code>description</code> means long description.”</p>
+  <table>
+    <tr><th>Error</th><th>What it means</th><th>Fix</th></tr>
+    <tr><td><code>submission_display_name_required</code></td><td>Display name is empty, blank or multi-line.</td><td>Enter a single-line name.</td></tr>
+    <tr><td><code>submission_display_name_too_long</code></td><td>Over {LIMITS.displayName} characters.</td><td>Shorten; move detail to the subtitle.</td></tr>
+    <tr><td><code>submission_subtitle_too_long</code></td><td>Short description over {LIMITS.subtitle} characters.</td><td>Aim for a verb + object: “Track invoices in chat”.</td></tr>
+    <tr><td><code>submission_description_too_long</code></td><td>Long description over {LIMITS.longDescription.toLocaleString('en-US')} characters.</td><td>Cut repetition and marketing language.</td></tr>
+    <tr><td><code>submission_developer_name_too_long</code></td><td>Developer name over {LIMITS.developerName} characters.</td><td>Use your verified legal or business name.</td></tr>
+    <tr><td><code>…_character_unsupported</code></td><td>Hidden or control characters.</td><td>Retype or paste as plain text.</td></tr>
+    <tr><td><code>plugin_capability_invalid</code></td><td>A capability is empty, multi-line, has unsupported text or is over {LIMITS.capability} characters.</td><td>One short line per capability.</td></tr>
+    <tr><td><code>plugin_default_prompt_mention</code></td><td>A starter prompt contains an MCP server <code>@mention</code>.</td><td>Remove the @name.</td></tr>
+    <tr><td><code>plugin_default_prompt_duplicate</code></td><td>Two prompts are the same after normalisation.</td><td>Make each prompt a different use case.</td></tr>
+    <tr><td><code>plugin_brand_color_contrast</code></td><td>Light brand colour is under 2:1 against white.</td><td>Pick a darker shade.</td></tr>
+    <tr><td><code>plugin_brand_color_dark_contrast</code></td><td>Dark brand colour is under 2:1 against <code>#212121</code>.</td><td>Pick a lighter shade.</td></tr>
+    <tr><td><code>plugin_website_url_format</code> (and support / privacy / terms)</td><td>Not an HTTPS URL.</td><td>Use <code>https://</code>.</td></tr>
+    <tr><td><code>plugin_category_unknown</code></td><td>Category is not on the supported list.</td><td>Pick one of the {CATEGORIES.length} categories.</td></tr>
+  </table>
+
+  <h2>Upload limits are looser — don’t be fooled</h2>
+  <p>The interface errors show two limits for several fields: one “for package validation” and a stricter one “for final directory submission”. Display name: {LIMITS.pkgDisplayName} vs {LIMITS.displayName}. Short description: {LIMITS.pkgShortDescription} vs {LIMITS.subtitle}. Developer name: {LIMITS.pkgDeveloperName} vs {LIMITS.developerName}. Starter prompts: {LIMITS.pkgStarterPrompt} vs {LIMITS.starterPrompt}. Listing URLs: {LIMITS.pkgUrl.toLocaleString('en-US')} vs {LIMITS.url.toLocaleString('en-US')}.</p>
+
+  <h2>Extra requirements for remote MCP plugins</h2>
+  <p>According to the reference, a remote MCP plugin also needs: the four listing URLs; a demo-recording URL; exactly five positive test cases, three negative test cases and release notes; a production HTTPS MCP server URL with a completed domain-verification challenge and a current tool scan; explicit <code>readOnlyHint</code>, <code>openWorldHint</code> and <code>destructiveHint</code> values; and reviewer-ready demo credentials when the server uses OAuth. Screenshots are only allowed when the MCP server provides custom UI.</p>
+  <p><strong>Note a discrepancy:</strong> the submission-errors page also says each annotation needs a justification (<code>justification_required</code>), while the plugin guidelines now say “Annotation justifications are no longer required.” Both pages were live on the last-checked date. If the portal asks for justifications, provide them.</p>
+
+  <h2>Every submission also needs</h2>
+  <ul>
+    <li>Passing safety and security scans for every bundled skill. The reference says scans “can take up to 2 hours”.</li>
+    <li>A verified developer or business identity and all required policy attestations.</li>
+  </ul>
+
+  <h2>ZIP upload gotchas</h2>
+  <ul>
+    <li>Compressed ZIP up to 100 MB; extracted archive up to 512 MiB; at most 5,000 entries; each entry up to 100 MiB; paths at most 20 segments deep.</li>
+    <li>Skills-only ZIPs must not include <code>interface.screenshots</code>, and must not include <code>apps</code> or <code>.app.json</code>.</li>
+    <li>For ZIP uploads the developer name is set automatically from your verified developer identity, whatever the ZIP says (<code>developer_name_defaulted</code>).</li>
+    <li>Branding images (logo, composer icon): PNG, JPEG, WebP or SVG; square; at least 48×48 and at most 4,096×4,096 pixels; up to 5 MiB.</li>
+  </ul>
+</Guide>

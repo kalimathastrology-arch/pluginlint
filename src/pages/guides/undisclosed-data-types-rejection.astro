@@ -1,0 +1,40 @@
+---
+import Guide from '../../layouts/Guide.astro';
+import { u } from '../../lib/url';
+---
+<Guide title="Fixing the “returns undisclosed user-related data types” rejection" description="Why ChatGPT plugins get rejected for returning data their privacy policy doesn't disclose, what fields to remove (session/trace/request IDs, timestamps, internal account IDs, logs, secrets), and how to audit tool outputs." sources={['appReview', 'guidelines']}>
+  <p class="lede">OpenAI’s review page lists this among common rejection reasons for remote MCP plugins: “Your plugin returns user-related data types that are not disclosed in your privacy policy.” The fix is usually to return less, not to write more policy.</p>
+
+  <h2>What OpenAI asks you to do</h2>
+  <p>Paraphrasing the <a href="https://developers.openai.com/plugins/deploy/app-review" rel="noopener">review requirements</a>:</p>
+  <ol>
+    <li>Run a few realistic requests and list every user-related field your server returns, including nested fields and “debug” payloads.</li>
+    <li>Return only what is strictly necessary for the request.</li>
+    <li>Remove unnecessary PII, telemetry and internal identifiers — the page names session, trace or request IDs, timestamps, internal account IDs and logs — and any auth secrets (tokens, keys or passwords).</li>
+    <li>Optionally update your privacy policy to disclose every category of personal data you collect, process or return, and why. But: “if a field isn't truly needed, remove it rather than disclose it.”</li>
+    <li>If a user identifier is truly necessary, make it explicitly requested and tied to the user’s intent, not “looked up and echoed” by default.</li>
+  </ol>
+  <p>The plugin guidelines say the same in their “Response minimization” rule: tool responses should not include diagnostic, telemetry or internal identifiers “such as session IDs, trace IDs, request IDs, timestamps, or logging metadata” unless strictly required.</p>
+
+  <h2>Where leaks usually hide</h2>
+  <ul>
+    <li><strong>Serialised ORM objects.</strong> Returning a whole database row brings <code>created_at</code>, <code>updated_at</code>, <code>owner_id</code> and more.</li>
+    <li><strong>Wrapped API responses.</strong> Upstream APIs often include <code>request_id</code> or <code>trace_id</code> next to the data.</li>
+    <li><strong>Error paths.</strong> A caught exception returned as text can include a stack trace or SQL.</li>
+    <li><strong>JSON inside text.</strong> A <code>content[].text</code> string that is itself JSON gets read by reviewers just the same.</li>
+    <li><strong>Upsell banners.</strong> Not a privacy issue, but the guidelines forbid promoting upgrades, and they often ride along in the same payload.</li>
+  </ul>
+
+  <h2>A practical audit</h2>
+  <ol>
+    <li>In ChatGPT developer mode (or your MCP inspector), run each test-case prompt and copy the raw tool result.</li>
+    <li>Paste the results into the <a href={u('/tools/tool-output-privacy-audit/')}>tool-output privacy auditor</a>, with your published privacy policy text.</li>
+    <li>Delete every red item at the source (an allow-list serializer is the most reliable approach: build the response object field by field instead of filtering a full record).</li>
+    <li>For each amber item, decide: needed for the user’s request? If not, delete it. If yes, make sure the policy names the category and purpose.</li>
+    <li>Re-run and re-check before you resubmit.</li>
+  </ol>
+
+  <h2>What a disclosure should cover</h2>
+  <p>The guidelines say a privacy policy must explain, at minimum, the categories of personal data collected, the purposes of use, the categories of recipients, data retention timelines, and any controls offered to users. The auditor drafts a paragraph for the categories it found; you still need to fill in retention, recipients and controls truthfully.</p>
+  <p class="meta">This guide is general information, not legal advice.</p>
+</Guide>

@@ -1,0 +1,22 @@
+---
+import Base from '../layouts/Base.astro';
+import { GOOGLE_FORM_URL } from '../../site.config.mjs';
+---
+<Base title="Submit feedback or a correction" description="Report a wrong or outdated rule, suggest a check, or share feedback about PluginLint.">
+  <h1>Submit feedback or a correction</h1>
+  <p class="lede">Spotted a limit that changed, a check that misfires, or a rule we’re missing? Tell us.</p>
+  {GOOGLE_FORM_URL ? (
+    <p><a class="btn" href={GOOGLE_FORM_URL} rel="noopener">Open the feedback form (Google Forms)</a></p>
+  ) : (
+    <div class="todo">
+      <p><strong>TODO (site owner):</strong> create a Google Form and set <code>GOOGLE_FORM_URL</code> in <code>site.config.mjs</code>. Until then there is no form on this page.</p>
+    </div>
+  )}
+  <p>PluginLint itself does not collect anything on this page. The form, once linked, is hosted by Google.</p>
+  <h2>Helpful details to include</h2>
+  <ul>
+    <li>The rule or tool, and what you expected.</li>
+    <li>A link to the OpenAI doc section that shows the correct rule.</li>
+    <li>For false positives in the privacy auditor: the key name and a <em>fake</em> example value — never real customer data.</li>
+  </ul>
+</Base>

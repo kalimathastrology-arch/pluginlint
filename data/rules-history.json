@@ -1,0 +1,38 @@
+{
+  "description": "Changes detected in the OpenAI plugin docs pages tracked by PluginLint.",
+  "pages": {
+    "submission-errors": {
+      "title": "Plugin submission errors",
+      "url": "https://developers.openai.com/plugins/deploy/submission-errors",
+      "hash": "d15c779fe23a26f6e012b4fc73de11ba4ac2f16e6aaf6620b113d9b7776a12f6",
+      "lastChanged": "2026-10-26"
+    },
+    "plugin-guidelines": {
+      "title": "Plugin guidelines",
+      "url": "https://developers.openai.com/plugins/plugin-guidelines",
+      "hash": "741095eb35cf86291149920fbad53f24eb1a5cadc58cb582f025f9031e929188",
+      "lastChanged": "2026-10-26"
+    }
+  },
+  "entries": [
+    {
+      "date": "2026-10-26",
+      "page": "plugin-guidelines",
+      "title": "Plugin guidelines",
+      "url": "https://developers.openai.com/plugins/plugin-guidelines",
+      "type": "baseline",
+      "hash": "741095eb35cf86291149920fbad53f24eb1a5cadc58cb582f025f9031e929188",
+      "summary": "Started tracking “Plugin guidelines” (173 lines of text)."
+    },
+    {
+      "date": "2026-10-26",
+      "page": "submission-errors",
+      "title": "Plugin submission errors",
+      "url": "https://developers.openai.com/plugins/deploy/submission-errors",
+      "type": "baseline",
+      "hash": "d15c779fe23a26f6e012b4fc73de11ba4ac2f16e6aaf6620b113d9b7776a12f6",
+      "summary": "Started tracking “Plugin submission errors” (703 lines of text)."
+    }
+  ],
+  "updated": "2026-10-26"
+}

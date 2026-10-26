@@ -1,0 +1,65 @@
+---
+import Base from '../layouts/Base.astro';
+import { BEEHIIV_EMBED_URL } from '../../site.config.mjs';
+import { LIMITS, LAST_CHECKED } from '../lib/rules-data';
+import { u } from '../lib/url';
+import history from '../../data/rules-history.json';
+const latest = (history.entries as { date: string; title: string; summary: string }[])[0];
+---
+<Base title="PluginLint" description="PluginLint is a free, private toolkit for developers listing a plugin in the ChatGPT plugin directory: a browser-only listing grader, a rules reference with sources, and plain-English guides.">
+  <h1>Get your ChatGPT plugin listing right the first time</h1>
+  <p class="lede">PluginLint is a free toolkit for developers submitting a plugin to the ChatGPT plugin directory. Check your listing fields against OpenAI’s published limits before the submission portal rejects them.</p>
+  <p><a class="btn" href={u('/grader/')}>Open the listing grader</a> <a class="btn secondary" href={u('/rules/')}>See all the limits</a></p>
+
+  <h2>What you get</h2>
+  <div class="card">
+    <h3>Listing grader</h3>
+    <p>Paste your display name, subtitle, description, starter prompts, capabilities, URLs and brand colours. You get a score and a pass / warn / fail list with a plain-language fix for each issue. It runs entirely in your browser; nothing is uploaded.</p>
+  </div>
+  <div class="card">
+    <h3>Tool-output privacy auditor</h3>
+    <p>Paste real MCP tool results. It flags personal data, session/trace/request IDs, timestamps, internal account IDs, secrets, debug payloads and upsell text — the things OpenAI’s review page asks you to remove — and checks which ones your privacy policy mentions. <a href={u('/tools/tool-output-privacy-audit/')}>Open the auditor</a>.</p>
+  </div>
+  <div class="card">
+    <h3>Test-case linter</h3>
+    <p>Paste your <code>tools/list</code> result and draft test cases. It checks the five-positive / three-negative rule, tool names and annotations, then writes a <code>chatgpt-app-submission.json</code> that validates against OpenAI’s public schema. <a href={u('/tools/test-case-linter/')}>Open the linter</a>.</p>
+  </div>
+  <div class="card">
+    <h3>Rules reference + change log</h3>
+    <p>Every final-submission limit in one table, linked to the OpenAI page it comes from. A small script re-reads those two public docs pages once a day and records any wording change, so you can see when a limit moves.</p>
+  </div>
+  <div class="card">
+    <h3>Plain-English guides</h3>
+    <ul>
+      <li><a href={u('/guides/plugin-name-character-limit/')}>Plugin name character limit (and naming rules)</a></li>
+      <li><a href={u('/guides/starter-prompts-rules/')}>Starter prompt rules</a></li>
+      <li><a href={u('/guides/submission-errors-explained/')}>Submission errors explained</a></li>
+      <li><a href={u('/guides/undisclosed-data-types-rejection/')}>Fixing the “undisclosed data types” rejection</a></li>
+      <li><a href={u('/guides/mcp-test-cases/')}>Writing the 5 positive + 3 negative test cases</a></li>
+      <li><a href={u('/guides/screenshot-size-requirements/')}>Screenshot size requirements</a></li>
+    </ul>
+  </div>
+
+  <h2>The limits people hit most</h2>
+  <table>
+    <tr><th>Field</th><th>Final-submission limit</th></tr>
+    <tr><td>Display name</td><td>{LIMITS.displayName} characters, one line</td></tr>
+    <tr><td>Short description (subtitle)</td><td>{LIMITS.subtitle} characters, one line</td></tr>
+    <tr><td>Long description</td><td>{LIMITS.longDescription.toLocaleString('en-US')} characters</td></tr>
+    <tr><td>Starter prompts</td><td>Up to {LIMITS.starterPromptsMax}, each ≤ {LIMITS.starterPrompt} characters, unique, no @mentions</td></tr>
+    <tr><td>Capabilities</td><td>Up to {LIMITS.capabilitiesMax}, each ≤ {LIMITS.capability} characters</td></tr>
+  </table>
+  <p class="meta">Last checked against OpenAI’s docs on {LAST_CHECKED}.{latest && <> Latest watcher entry: {latest.date} — {latest.summary}</>}</p>
+
+  <h2 id="newsletter">Get an email when the rules change</h2>
+  {BEEHIIV_EMBED_URL ? (
+    <iframe src={BEEHIIV_EMBED_URL} title="Newsletter sign-up" width="100%" height="320" frameborder="0" scrolling="no" style="border:0;max-width:100%" loading="lazy"></iframe>
+  ) : (
+    <div class="todo">
+      <p><strong>TODO (site owner):</strong> newsletter sign-up goes here. Set <code>BEEHIIV_EMBED_URL</code> in <code>site.config.mjs</code> to your beehiiv embed URL and rebuild. Until then no sign-up form is shown and no email is collected.</p>
+    </div>
+  )}
+
+  <h2>Who runs this?</h2>
+  <p>An independent developer. PluginLint is not affiliated with OpenAI. It uses only OpenAI’s public developer documentation as its source and does not collect or scrape data from chatgpt.com. <a href={u('/about/')}>More about the project</a>.</p>
+</Base>

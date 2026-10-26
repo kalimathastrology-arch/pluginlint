@@ -1,0 +1,73 @@
+---
+import Base from '../layouts/Base.astro';
+import Sources from '../components/Sources.astro';
+import { RULES_TABLE, SOURCES, LIMITS, CATEGORIES, LAST_CHECKED } from '../lib/rules-data';
+import history from '../../data/rules-history.json';
+import { u } from '../lib/url';
+type Entry = { date: string; title: string; url: string; type: string; summary: string; diff?: { added: string[]; removed: string[] } };
+const entries = history.entries as Entry[];
+---
+<Base title="ChatGPT plugin directory rules and limits" description={`Reference of every ChatGPT plugin directory listing limit — display name ${LIMITS.displayName}, subtitle ${LIMITS.subtitle}, description ${LIMITS.longDescription.toLocaleString('en-US')} characters, starter prompts, capabilities, URLs, brand colours, screenshots — with sources and a changelog.`}>
+  <h1>Plugin directory rules &amp; limits</h1>
+  <p class="lede">The final-submission limits for a ChatGPT plugin directory listing, in one table, with the OpenAI page each rule comes from.</p>
+  <p class="meta">Last checked by hand: <time datetime={LAST_CHECKED}>{LAST_CHECKED}</time>. A watcher also re-reads the two source pages daily and logs changes below.</p>
+
+  <h2>Listing limits</h2>
+  <table>
+    <thead><tr><th>Field</th><th>Rule</th><th>Type</th><th>Source</th></tr></thead>
+    <tbody>
+      {RULES_TABLE.map((r) => (
+        <tr>
+          <td>{r.field}</td>
+          <td>{r.rule}{r.errorCodes && <div class="meta">{r.errorCodes.map((c) => <code>{c}</code>)}</div>}</td>
+          <td>{r.kind === 'error' ? 'Blocks submission' : 'Review guideline'}</td>
+          <td><a href={SOURCES[r.source].url} rel="noopener">{r.source === 'guidelines' ? 'Guidelines' : 'Submission errors'}</a></td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+
+  <h2>Upload validation vs. final submission</h2>
+  <p>OpenAI checks a package twice. The upload (package) validation is looser; final directory submission is stricter. Write to the final limits.</p>
+  <table>
+    <thead><tr><th>Field</th><th>Package validation</th><th>Final submission</th></tr></thead>
+    <tbody>
+      <tr><td>Display name</td><td>{LIMITS.pkgDisplayName}</td><td>{LIMITS.displayName}</td></tr>
+      <tr><td>Short description</td><td>{LIMITS.pkgShortDescription}</td><td>{LIMITS.subtitle}</td></tr>
+      <tr><td>Developer name</td><td>{LIMITS.pkgDeveloperName}</td><td>{LIMITS.developerName}</td></tr>
+      <tr><td>Starter prompt (each)</td><td>{LIMITS.pkgStarterPrompt}</td><td>{LIMITS.starterPrompt}</td></tr>
+      <tr><td>Listing URLs</td><td>{LIMITS.pkgUrl.toLocaleString('en-US')}</td><td>{LIMITS.url.toLocaleString('en-US')}</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Supported categories</h2>
+  <p>{CATEGORIES.join(' · ')}</p>
+
+  <h2>Text rules that apply everywhere</h2>
+  <ul>
+    <li>Non-empty values can’t contain only whitespace.</li>
+    <li>“Supported text” excludes control characters, Unicode line or paragraph separators, and unsupported invisible formatting characters.</li>
+    <li>HTTPS URLs must include a host and contain no embedded credentials.</li>
+  </ul>
+
+  <p><a class="btn" href={u('/grader/')}>Check your listing against these rules</a></p>
+
+  <h2 id="changelog">Changelog of the source pages</h2>
+  <p>Generated from <code>data/rules-history.json</code>, which the docs watcher updates when the text of either OpenAI page changes. Also available as an <a href={u('/rss.xml')}>RSS feed</a>.</p>
+  {entries.length === 0 ? <p>No entries yet.</p> : (
+    <ul>
+      {entries.map((e) => (
+        <li id={`${(e as any).page}-${e.date}-${e.type}`}>
+          <strong><time datetime={e.date}>{e.date}</time></strong> — <a href={e.url} rel="noopener">{e.title}</a>: {e.summary}
+          {e.diff && (e.diff.added.length > 0 || e.diff.removed.length > 0) && (
+            <details><summary>Changed lines</summary>
+              {e.diff.removed.map((l) => <div class="meta">− {l}</div>)}
+              {e.diff.added.map((l) => <div class="meta">+ {l}</div>)}
+            </details>
+          )}
+        </li>
+      ))}
+    </ul>
+  )}
+  <Sources />
+</Base>

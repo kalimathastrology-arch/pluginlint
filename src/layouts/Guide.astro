@@ -1,0 +1,22 @@
+---
+import Base from './Base.astro';
+import Sources from '../components/Sources.astro';
+import { LAST_CHECKED, type SourceKey } from '../lib/rules-data';
+import { u } from '../lib/url';
+interface Props { title: string; description: string; sources?: SourceKey[] }
+const { title, description, sources } = Astro.props;
+const ld = {
+  '@context': 'https://schema.org', '@type': 'TechArticle', headline: title, description,
+  dateModified: LAST_CHECKED, datePublished: '2026-10-26', author: { '@type': 'Organization', name: 'PluginLint' },
+  mainEntityOfPage: new URL(Astro.url.pathname, Astro.site).toString(),
+};
+---
+<Base title={title} description={description} jsonLd={ld} type="article">
+  <p class="meta"><a href={u('/guides/')}>Guides</a> › Last checked <time datetime={LAST_CHECKED}>{LAST_CHECKED}</time></p>
+  <article>
+    <h1>{title}</h1>
+    <slot />
+  </article>
+  <p><a class="btn" href={u('/grader/')}>Check your listing with the free grader</a></p>
+  <Sources keys={sources} />
+</Base>

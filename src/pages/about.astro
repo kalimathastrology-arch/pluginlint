@@ -1,0 +1,34 @@
+---
+import Base from '../layouts/Base.astro';
+import { u } from '../lib/url';
+import { SOURCES, LAST_CHECKED } from '../lib/rules-data';
+---
+<Base title="About PluginLint" description="PluginLint is an independent, free toolkit for ChatGPT plugin developers. Not affiliated with OpenAI. How the data is sourced and what else exists.">
+  <h1>About PluginLint</h1>
+  <p class="lede">PluginLint is a small, free, independent project that helps developers prepare a ChatGPT plugin directory submission.</p>
+
+  <h2>Independent and not affiliated with OpenAI</h2>
+  <p>PluginLint is not made, endorsed or sponsored by OpenAI. The tools only reflect what OpenAI’s public documentation says; passing every check here does not mean a plugin will be approved. OpenAI’s reviewers make the decisions, and their docs are the source of truth.</p>
+
+  <h2>Free</h2>
+  <p>The tools are free to use with no account. The site may later show clearly labelled ads to cover hosting costs. There are no paid plans.</p>
+
+  <h2>How the data is sourced</h2>
+  <ul>
+    <li>Rules come only from OpenAI’s public developer documentation: <a href={SOURCES.submissionErrors.url} rel="noopener">submission errors</a>, <a href={SOURCES.guidelines.url} rel="noopener">plugin guidelines</a>, <a href={SOURCES.appReview.url} rel="noopener">MCP review requirements</a> and the public <a href={SOURCES.submissionSchema.url} rel="noopener">submission JSON schema</a>. They were last checked by hand on {LAST_CHECKED}.</li>
+    <li>A script fetches the two rules pages once a day (one request each, with an honest User-Agent) and records text changes in a public <a href={u('/rules/#changelog')}>changelog</a>.</li>
+    <li>PluginLint does <strong>not</strong> scrape, crawl or fetch chatgpt.com or the plugin directory, and does not publish per-plugin data. OpenAI’s terms prohibit automated extraction of data from its services.</li>
+    <li>Everything you paste into the tools is processed in your browser and never sent to us. See <a href={u('/privacy/')}>Privacy</a>.</li>
+  </ul>
+
+  <h2>Other useful projects</h2>
+  <p>PluginLint focuses on pre-submission checks that run locally. Other independent projects cover different needs; we are not connected to any of them:</p>
+  <ul>
+    <li><a href="https://reviewtimes.fyi/chatgpt" rel="noopener">reviewtimes.fyi</a> — crowdsourced review wait times for the ChatGPT plugin store and other AI app stores, plus a list of known rejection reasons.</li>
+    <li><a href="https://github.com/stevysmith/mcplane" rel="noopener">mcplane</a> — a command-line tool from the same author that pre-checks an MCP server against each store’s known rejection causes.</li>
+    <li><a href="https://pluginsradar.com/" rel="noopener">Plugins Radar</a> — a free tracker of the public ChatGPT plugin directory: search rankings, competitors, listing changes and Featured placements, updated hourly.</li>
+  </ul>
+
+  <h2>Corrections</h2>
+  <p>If a rule here is wrong or out of date, please tell us via the <a href={u('/submit/')}>feedback page</a>. Corrections are welcome and will be logged.</p>
+</Base>

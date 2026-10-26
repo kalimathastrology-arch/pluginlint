@@ -1,0 +1,97 @@
+---
+import Base from '../../layouts/Base.astro';
+import Sources from '../../components/Sources.astro';
+import { u } from '../../lib/url';
+const ld = { '@context': 'https://schema.org', '@type': 'WebApplication', name: 'PluginLint tool-output privacy auditor', applicationCategory: 'DeveloperApplication', operatingSystem: 'Any (runs in your browser)', offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' } };
+---
+<Base title="Tool-output privacy auditor for MCP plugins" description="Paste MCP tool-result JSON and find personal data, session/trace/request IDs, timestamps, internal account IDs, secrets, logs and upsell text that can get a ChatGPT plugin rejected. Checks your privacy policy for disclosure. Runs in your browser." jsonLd={ld}>
+  <h1>Tool-output privacy auditor</h1>
+  <p class="lede">One of the common rejection reasons OpenAI lists for remote MCP plugins is returning user-related data that your privacy policy doesn’t disclose. Paste real tool results and see every field a reviewer may question.</p>
+  <p class="card"><strong>Nothing leaves your browser.</strong> Parsing and matching happen in this page. Still, prefer test/demo data over real customer records. <strong>Not legal advice</strong> — this is a pattern-matching aid, not a privacy review.</p>
+
+  <blockquote class="card">
+    <p>OpenAI’s review page says, under common rejection reasons: <em>“Your plugin returns user-related data types that are not disclosed in your privacy policy.”</em> It asks you to list every user-related field the server returns, “including nested fields and ‘debug’ payloads”, and to remove unnecessary PII, “telemetry/internal identifiers (for example, session, trace, or request IDs; timestamps; internal account IDs; or logs) and any auth secrets (tokens, keys, or passwords).” It adds: “if a field isn't truly needed, remove it rather than disclose it.”</p>
+    <p class="meta">Source: <a href="https://developers.openai.com/plugins/deploy/app-review" rel="noopener">Remote MCP server review requirements</a>, last checked 2026-10-26.</p>
+  </blockquote>
+
+  <form id="f" onsubmit="return false">
+    <label>Tool result JSON <span class="hint">one or more blobs — a JSON array, or separate blobs with a blank line or <code>---</code>. From ChatGPT developer mode or your MCP inspector.</span>
+      <textarea id="blobs" rows="12" spellcheck="false" style="font-family:ui-monospace,monospace"></textarea></label>
+    <label>Privacy policy text (optional) <span class="hint">paste the published policy to check which categories it mentions</span>
+      <textarea id="policy" rows="6"></textarea></label>
+    <label>Product name for the draft paragraph <input type="text" id="product" placeholder="Acme" /></label>
+    <p><button class="btn" id="run" type="button">Audit</button> <button class="btn secondary" id="sample" type="button">Load a leaky example</button></p>
+  </form>
+
+  <section id="out" hidden aria-live="polite">
+    <h2>Findings</h2>
+    <p id="summary"></p>
+    <ul class="results" id="list"></ul>
+    <h2>Remove or disclose</h2>
+    <table><thead><tr><th>Data category</th><th>Severity</th><th>Action</th><th>In policy? <span class="hint">(heuristic)</span></th><th>Where</th></tr></thead><tbody id="table"></tbody></table>
+    <h2>Draft privacy-policy disclosure</h2>
+    <p class="meta">Only for categories you decide you truly need. Fill the bracketed parts. Have it reviewed by someone qualified.</p>
+    <textarea id="draft" rows="10" readonly></textarea>
+    <p><button class="btn" id="copy" type="button">Copy report</button> <span id="copied" class="meta"></span></p>
+  </section>
+
+  <h2>How it works</h2>
+  <ul>
+    <li>Walks every nested path, including JSON strings inside <code>content[].text</code>.</li>
+    <li>Flags by <strong>key name</strong> (e.g. <code>session_id</code>, <code>trace_id</code>, <code>request_id</code>, <code>correlation_id</code>, <code>email</code>, <code>phone</code>, <code>address</code>, <code>createdAt</code>, <code>debug</code>, <code>stack</code>) and by <strong>value pattern</strong> (emails, phone numbers, ISO 8601 timestamps, JWTs, <code>sk-</code> style keys, Bearer tokens, stack traces, Luhn-valid card numbers, IP addresses, upgrade/promo wording, internal model instructions).</li>
+    <li><strong>Red</strong> = remove (secrets, internal IDs, logs, internal model text). <strong>Amber</strong> = remove if not needed, otherwise disclose.</li>
+    <li>Policy matching is keyword-based. A “yes” means a related word appears, not that the disclosure is adequate.</li>
+  </ul>
+  <p>Read the guide: <a href={u('/guides/undisclosed-data-types-rejection/')}>Fixing the “undisclosed data types” rejection</a>.</p>
+  <Sources keys={['appReview', 'guidelines']} />
+
+  <script>
+    import { audit, draftDisclosure } from '../../lib/privacy-audit';
+    const $ = (id: string) => document.getElementById(id)!;
+    let report = '';
+    const sample = {
+      content: [{ type: 'text', text: 'Found 1 overdue invoice.' }],
+      structuredContent: {
+        invoice: { number: 'INV-1042', amount: 1200, customer: { name: 'Priya Sharma', email: 'priya@example.com', phone: '+91 98765 43210' } },
+        request_id: 'req_8f2a91c3', trace_id: 'abc123def456', createdAt: '2026-10-26T05:30:00Z', internal_account_id: 'acct_99812',
+        debug: { query: 'SELECT * FROM invoices WHERE overdue', ms: 41 },
+        banner: 'Upgrade to Pro for 20% off this week!',
+      },
+    };
+    $('sample').addEventListener('click', () => {
+      ($('blobs') as HTMLTextAreaElement).value = JSON.stringify(sample, null, 2);
+      ($('policy') as HTMLTextAreaElement).value = 'We collect your name and email address to provide the service.';
+      run();
+    });
+    function run() {
+      const r = audit(($('blobs') as HTMLTextAreaElement).value, ($('policy') as HTMLTextAreaElement).value);
+      $('out').hidden = false;
+      const bad = r.blobs.filter((b) => !b.ok);
+      const red = r.findings.filter((f) => f.severity === 'red').length;
+      $('summary').textContent = `${r.blobs.length} blob(s) parsed${bad.length ? `, ${bad.length} invalid (${bad.map((b) => `#${b.index + 1}: ${b.error}`).join('; ')})` : ''}. ${r.findings.length} finding(s): ${red} red, ${r.findings.length - red} amber.`;
+      const list = $('list'); list.innerHTML = '';
+      for (const f of [...r.findings].sort((a, b) => (a.severity === b.severity ? 0 : a.severity === 'red' ? -1 : 1))) {
+        const li = document.createElement('li'); li.className = f.severity === 'red' ? 'fail' : 'warn';
+        const tag = document.createElement('span'); tag.className = `tag ${li.className}`; tag.textContent = f.severity.toUpperCase();
+        const code = document.createElement('code'); code.textContent = f.path;
+        li.append(tag, code, document.createTextNode(` — ${f.category} (${f.reason}). Sample: ${f.sample}. → ${f.action}.`));
+        list.append(li);
+      }
+      if (!r.findings.length) list.innerHTML = '<li class="pass">No flagged fields. Heuristics can miss things — still review every field manually.</li>';
+      const tb = $('table'); tb.innerHTML = '';
+      for (const c of r.categories) {
+        const tr = document.createElement('tr');
+        const cells = [c.category, c.severity === 'red' ? 'Red' : 'Amber', c.action, c.disclosed === null ? '— (no policy pasted)' : c.action === 'Remove' ? 'n/a — remove' : c.disclosed ? 'Mentioned' : 'Not found', c.paths.join(', ')];
+        for (const x of cells) { const td = document.createElement('td'); td.textContent = x; tr.append(td); }
+        tb.append(tr);
+      }
+      const d = draftDisclosure(r, ($('product') as HTMLInputElement).value || '[Your product]');
+      ($('draft') as HTMLTextAreaElement).value = d;
+      report = ['PluginLint tool-output privacy audit (heuristic, not legal advice)', $('summary').textContent, '',
+        ...r.findings.map((f) => `[${f.severity.toUpperCase()}] ${f.path} — ${f.category} (${f.reason}) → ${f.action}${f.disclosed === null ? '' : f.disclosed ? ' [policy mentions]' : ' [not in policy]'}`),
+        '', 'Draft disclosure:', d].join('\n');
+    }
+    $('run').addEventListener('click', run);
+    $('copy').addEventListener('click', async () => { try { await navigator.clipboard.writeText(report); $('copied').textContent = 'Copied.'; } catch { $('copied').textContent = 'Copy failed.'; } });
+  </script>
+</Base>

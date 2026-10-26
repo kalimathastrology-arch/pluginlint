@@ -1,0 +1,37 @@
+---
+import Guide from '../../layouts/Guide.astro';
+import { u } from '../../lib/url';
+---
+<Guide title="Writing the 5 positive and 3 negative test cases for a ChatGPT plugin" description="Remote MCP plugin submissions need exactly five positive and three negative test cases. What fields each case needs per OpenAI's submission schema, and how to write cases reviewers can verify." sources={['submissionErrors', 'submissionSchema', 'appReview']}>
+  <p class="lede">The submission reference says a remote MCP plugin needs “exactly five positive test cases, three negative test cases, and release notes”. The review page lists failed test cases as a common rejection reason. Here is how to get them right.</p>
+
+  <h2>Fields per case</h2>
+  <p>OpenAI publishes a JSON schema for the submission import file, <a href="https://developers.openai.com/apps-sdk/schemas/chatgpt-app-submission.v1.json" rel="noopener"><code>chatgpt-app-submission.v1.json</code></a>. It defines:</p>
+  <table>
+    <tr><th></th><th>Required</th><th>Optional</th></tr>
+    <tr><td>Positive case</td><td><code>description</code> (≤ 4,000 chars), <code>user_prompt</code>, <code>tools_triggered</code></td><td><code>expected_output</code>, <code>expected_output_url</code>, <code>file_attachment_urls</code></td></tr>
+    <tr><td>Negative case</td><td><code>description</code>, <code>user_prompt</code></td><td><code>tools_triggered</code>, <code>expected_output</code>, <code>expected_output_url</code>, <code>file_attachment_urls</code></td></tr>
+  </table>
+  <p>The schema sets <code>minItems</code> of 5 and 3; the submission page says exactly 5 and 3. Aim for exactly. The schema also expects, per tool, the three annotation booleans and three justification strings — while the guidelines say justifications are no longer required. Our <a href={u('/tools/test-case-linter/')}>test-case linter</a> keeps the file schema-valid either way.</p>
+
+  <h2>Positive cases: make them verifiable</h2>
+  <ul>
+    <li>Use the demo account’s real sample data so the reviewer gets the answer you describe.</li>
+    <li>Write <code>expected_output</code> precisely: what list, which fields, roughly how many items.</li>
+    <li>Cover your main tools; don’t spend all five on one.</li>
+    <li>Be careful with state-changing tools. A reviewer will actually run the prompt. Make the action safe to repeat on the demo account, and say what will happen.</li>
+    <li>The review page warns that output should not offer “extraneous information that is irrelevant to the request, including personal identifiers”.</li>
+  </ul>
+
+  <h2>Negative cases: show restraint</h2>
+  <p>A negative case is a prompt where your plugin should <em>not</em> be used, or should decline. Good ones are near-misses: related to your domain but outside what the plugin does, or general-knowledge questions the model can answer itself.</p>
+
+  <h2>Common mistakes the linter catches</h2>
+  <ul>
+    <li>Four or six positive cases instead of five.</li>
+    <li><code>tools_triggered</code> naming a tool that isn’t in <code>tools/list</code> (renamed tools are the usual cause).</li>
+    <li>Vague prompts such as “test” or “help me”.</li>
+    <li><code>@mentions</code> in prompts.</li>
+    <li>Tools without explicit <code>readOnlyHint</code>, <code>openWorldHint</code> and <code>destructiveHint</code>.</li>
+  </ul>
+</Guide>
