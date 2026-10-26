@@ -1,0 +1,55 @@
+---
+import Guide from '../../layouts/Guide.astro';
+import { LIMITS } from '../../lib/rules-data';
+import { u } from '../../lib/url';
+---
+<Guide title="Why is my ChatGPT app submission stuck in review? What to check" seoTitle="ChatGPT App Submission Stuck in Review?" description="OpenAI doesn't publish review times. What its docs say about the review queue, plus a checklist of the mechanical checks that block a submission." summary="OpenAI does not publish review times: its review page says only that “review timelines may vary” and that requests for expedited review cannot be accommodated. What you can control is the mechanical side — listing limits, test cases, tool annotations, tool-output privacy, scans and reviewer access — so a waiting submission is not sitting on a problem you could have fixed before it was submitted.">
+  <p class="lede">“Stuck” usually means one of three things: the submission never left the portal because of an error, it is waiting in OpenAI’s review queue, or it was rejected and needs a fix. This guide separates them, lists what OpenAI’s <a href="https://developers.openai.com/plugins/deploy/app-review" rel="noopener">review requirements</a> and <a href="https://developers.openai.com/plugins/deploy/submission-errors" rel="noopener">submission-errors reference</a> actually say, and gives a checklist you can run before you resubmit. PluginLint is independent and not affiliated with OpenAI; only OpenAI’s reviewers decide approval.</p>
+
+  <h2>What OpenAI says about review status and timing</h2>
+  <ul>
+    <li><strong>No published timeline.</strong> The review FAQ answers “How long does review take?” with: review timelines may vary as OpenAI continues to build and scale its processes. It asks developers not to contact support to request expedited review, because those requests cannot be accommodated. For updates it says it is unable to offer estimated times either. We don’t know of any official figure, so we don’t quote one.</li>
+    <li><strong>Where to see status.</strong> Once submitted, the plugin enters the review queue. You can see its status in the Dashboard and you get an email notification for status changes. Viewing drafts and review status needs the <code>api.apps.read</code> permission; creating and submitting drafts needs <code>api.apps.write</code>. Organization owners have both.</li>
+    <li><strong>Automated and manual checks.</strong> OpenAI says it may perform automated scans or manual reviews.</li>
+    <li><strong>One in review at a time.</strong> For each MCP server integration, only one version may be published and only one version may be in review at a time. To change something after submitting, select <em>Cancel Review</em> and resubmit. Each resubmission starts a new review.</li>
+    <li><strong>Approval is not publication.</strong> When approved you are notified by email and then must select <em>Publish</em> in the portal; the plugin can’t appear in the directory until you do. Directory main pages only show plugins OpenAI selects for enhanced distribution, so to confirm a published plugin, search for its exact name or open its directory URL from the portal.</li>
+    <li><strong>Questions.</strong> If the docs don’t answer a question, OpenAI says to contact OpenAI support and include the ID shown in the plugin submission portal.</li>
+  </ul>
+
+  <h2>Is it blocked before review even starts?</h2>
+  <p>The submission-errors reference says errors block submission and warnings don’t, and that a package “can pass upload validation and still fail final directory submission” because final submission adds stricter listing limits plus MCP configuration, skill scans, test cases and policy attestations. Things that can hold a submission back at this stage:</p>
+  <ul>
+    <li><strong>Skill scans.</strong> Every bundled skill needs passing safety and security scans, and the reference says scans can take up to 2 hours.</li>
+    <li><strong>Tool scan.</strong> A remote MCP plugin needs a production HTTPS MCP server URL, a completed domain-verification challenge and a successful, current tool scan (<code>scan_required</code>). If you change tool annotations on your server, deploy, select <em>Scan Tools</em> again and check the updated values — the review page says justifications don’t override the annotations your server advertises.</li>
+    <li><strong>Identity.</strong> Every submission needs a verified developer or business identity and all required policy attestations. Publishing under an unverified name results in rejection.</li>
+    <li><strong>Data residency.</strong> The review page says projects with EU data residency currently cannot submit plugins with MCP servers for review; use a project with global data residency.</li>
+  </ul>
+
+  <h2>Pre-resubmission checklist</h2>
+  <p>Each item below is a documented final-submission rule or review requirement. Fixing them removes known mechanical causes of errors and rejections; it does not guarantee approval.</p>
+  <ol>
+    <li><strong>Display name and short description</strong> (subtitle): one line, at most {LIMITS.displayName} characters each (<code>submission_display_name_too_long</code>, <code>submission_subtitle_too_long</code>). Upload validation allows {LIMITS.pkgDisplayName} for the name, so a longer name can upload and still fail. See the <a href={u('/guides/plugin-name-character-limit/')}>name character limit guide</a>.</li>
+    <li><strong>Starter prompts:</strong> at most {LIMITS.starterPromptsMax}, each one line, at most {LIMITS.starterPrompt} characters, unique after normalisation, with no MCP server <code>@mention</code>. See <a href={u('/guides/starter-prompts-rules/')}>starter prompt rules</a>.</li>
+    <li><strong>Brand colour contrast:</strong> if set, the light colour needs at least {LIMITS.brandContrastMin}:1 contrast against white and the dark colour at least {LIMITS.brandContrastMin}:1 against <code>{LIMITS.brandDarkBackground}</code>.</li>
+    <li><strong>Screenshots:</strong> only when the MCP server provides custom UI; one PNG or JPEG per starter prompt, exactly {LIMITS.screenshotWidth} px wide and {LIMITS.screenshotMinHeight}–{LIMITS.screenshotMaxHeight} px tall. Don’t provide screenshots when the plugin has no UI. See <a href={u('/guides/screenshot-size-requirements/')}>screenshot size requirements</a>.</li>
+    <li><strong>Tool annotations:</strong> explicit <code>readOnlyHint</code>, <code>openWorldHint</code> and <code>destructiveHint</code> on every tool, matching what the tool really does; mismatched annotations are one of the four common rejection reasons. See <a href={u('/guides/mcp-tool-annotations/')}>MCP tool annotations explained</a>.</li>
+    <li><strong>Test cases:</strong> exactly five positive and three negative cases, plus release notes. Rerun every case on the demo account and compare actual output with the expected output; failing cases are a common rejection reason. See <a href={u('/guides/mcp-test-cases/')}>writing the 5 + 3 test cases</a>.</li>
+    <li><strong>Tool-output privacy:</strong> tools should return only what the request needs. OpenAI’s review page names unnecessary PII, session, trace or request IDs, timestamps, internal account IDs, logs and auth secrets as things to remove; undisclosed user-related data is a common rejection reason. See <a href={u('/guides/undisclosed-data-types-rejection/')}>fixing the undisclosed data types rejection</a>.</li>
+    <li><strong>Reviewer access:</strong> the MCP URL and demo credentials work, haven’t expired, need no further configuration and no MFA, and log in successfully from outside your company or local network.</li>
+    <li><strong>Remote MCP URLs:</strong> website, support, privacy policy and terms URLs use HTTPS and are at most {LIMITS.url.toLocaleString('en-US')} characters; a demo-recording URL shows the main use cases and tools.</li>
+  </ol>
+
+  <h2>Re-test with the free tools</h2>
+  <p>All three run in your browser; nothing you paste is uploaded.</p>
+  <ul>
+    <li><a href={u('/grader/')}>Listing grader</a>: checks name, subtitle, descriptions, starter prompts, capabilities, URLs and brand colours against the final-submission limits.</li>
+    <li><a href={u('/tools/tool-output-privacy-audit/')}>Tool-output privacy auditor</a>: paste raw tool results to flag PII, session/trace/request IDs, timestamps, internal IDs and secrets.</li>
+    <li><a href={u('/tools/test-case-linter/')}>Test-case linter</a>: checks the 5 + 3 test cases against your <code>tools/list</code> result, flags missing annotations, and outputs a schema-valid submission file.</li>
+  </ul>
+
+  <h2>If it was rejected</h2>
+  <p>OpenAI says that if a plugin is rejected because of its MCP server, tools or UI, you receive feedback on which checks were unsuccessful; you can make changes and resubmit, or appeal by replying to the email with a clear rationale and any new information. Our guide to <a href={u('/guides/why-chatgpt-plugin-submissions-get-rejected/')}>why submissions get rejected</a> maps each common reason to a fix.</p>
+
+  <h2>What isn’t known</h2>
+  <p>OpenAI doesn’t publish how long reviews take, how the queue is ordered, or what share of submissions are approved. Any timeline you see elsewhere is not an official OpenAI figure. OpenAI documents no way to speed up a submission that is already in the queue, and cancelling and resubmitting starts a new review.</p>
+</Guide>

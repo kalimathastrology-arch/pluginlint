@@ -3,6 +3,7 @@ export interface GuideInfo { slug: string; title: string; short: string; blurb: 
 
 export const GUIDES: GuideInfo[] = [
   { slug: 'why-chatgpt-plugin-submissions-get-rejected', title: 'Why ChatGPT plugin submissions get rejected: the mechanical causes', short: 'Why submissions get rejected', blurb: 'The four common rejection reasons on OpenAI’s review page, the identity and demo-account rules, and how each maps to a fix.' },
+  { slug: 'submission-stuck-in-review', title: 'Why is my ChatGPT app submission stuck in review? What to check', short: 'Stuck in review', blurb: 'What OpenAI’s docs say (and don’t say) about review status and timing, plus a checklist of the mechanical checks to fix before you resubmit.' },
   { slug: 'submission-errors-explained', title: 'ChatGPT plugin submission errors explained', short: 'Submission errors explained', blurb: 'The listing-field error codes from OpenAI’s submission-errors page, grouped and translated into fixes.' },
   { slug: 'mcp-tool-annotations', title: 'MCP tool annotations: readOnlyHint, openWorldHint and destructiveHint explained', short: 'MCP tool annotations', blurb: 'How to set the three required annotation booleans for each tool, with the edge cases OpenAI’s guidelines call out.' },
   { slug: 'mcp-test-cases', title: 'Writing the 5 positive + 3 negative test cases', short: 'Test cases (5 + 3)', blurb: 'Required fields per OpenAI’s submission schema and how to write cases reviewers can verify.' },

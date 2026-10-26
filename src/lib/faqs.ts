@@ -51,6 +51,13 @@ export const FAQS: Record<string, Faq[]> = {
     { q: 'Can I use a demo account that needs 2FA?', a: 'No. The guidelines say plugins that require extra login steps, such as a new account sign-up or 2FA through an inaccessible account, will be rejected, and the review page says credentials must not use MFA.' },
     { q: 'Can I ask OpenAI to expedite a review?', a: 'No. The review page asks developers not to contact support to request expedited review, as these requests cannot be accommodated.' },
   ],
+  'submission-stuck-in-review': [
+    { q: 'How long does ChatGPT plugin review take?', a: 'OpenAI does not publish a review time. Its review page says review timelines may vary as it continues to build and scale its processes, and it says it is unable to offer estimated times for update reviews either.' },
+    { q: 'Can I ask OpenAI to speed up my review?', a: 'No. The review page asks developers not to contact support to request expedited review, as these requests cannot be accommodated.' },
+    { q: 'Where can I see my submission’s review status?', a: 'In the OpenAI Platform Dashboard, and you get an email notification for status changes. Viewing drafts and review status needs the api.apps.read permission; organization owners have it automatically.' },
+    { q: 'Can I change my plugin while it is in review?', a: 'Only one version per MCP server integration can be in review at a time. To make changes, select Cancel Review and resubmit; each resubmission starts a new review.' },
+    { q: 'My plugin was approved. Why isn’t it in the directory?', a: 'Approval doesn’t publish it: you must select Publish in the plugin submission portal. Directory main pages only show plugins OpenAI selects for enhanced distribution, so search for the exact name or open the directory URL from the portal.' },
+  ],
   'mcp-tool-annotations': [
     { q: 'Which annotations does every MCP tool need for a ChatGPT plugin?', a: 'readOnlyHint, destructiveHint and openWorldHint, each set to an explicit boolean (true or false) in the tool’s annotations object. The submission error is annotations_required.' },
     { q: 'Do I still need annotation justifications?', a: 'The sources disagree. The plugin guidelines say annotation justifications are no longer required, while the submission-errors page still lists justification_required. If the portal asks for justifications, provide them.' },
