@@ -11,7 +11,9 @@ export const SITE_TAGLINE = 'Free, private tools for preparing a ChatGPT plugin 
 
 // TODO(beehiiv): paste your beehiiv embed URL here (Settings → Subscribe forms → Embed → the iframe src),
 // e.g. 'https://embeds.beehiiv.com/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx?slim=true'. Empty = placeholder shown.
-export const BEEHIIV_EMBED_URL = '';
+export const BEEHIIV_EMBED_URL = 'https://pluginlint-weekly.beehiiv.com';
+// beehiiv script-embed form id (Audience > Subscribe forms). Public page above is the fallback link.
+export const BEEHIIV_FORM_ID = '72839eeb-c1b7-4a01-9199-07161ff032dc';
 
 // TODO(google-form): paste the public Google Form URL for /submit. Empty = placeholder shown.
 export const GOOGLE_FORM_URL = 'https://forms.gle/h9FZE3tCoXm4fTJC8';

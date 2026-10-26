@@ -1,6 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
-import { BEEHIIV_EMBED_URL } from '../../site.config.mjs';
+import { BEEHIIV_EMBED_URL, BEEHIIV_FORM_ID } from '../../site.config.mjs';
 import { LIMITS, LAST_CHECKED } from '../lib/rules-data';
 import { u } from '../lib/url';
 import history from '../../data/rules-history.json';
@@ -52,11 +52,15 @@ const latest = (history.entries as { date: string; title: string; summary: strin
   <p class="meta">Last checked against OpenAI’s docs on {LAST_CHECKED}.{latest && <> Latest watcher entry: {latest.date} — {latest.summary}</>}</p>
 
   <h2 id="newsletter">Get an email when the rules change</h2>
-  {BEEHIIV_EMBED_URL ? (
-    <iframe src={BEEHIIV_EMBED_URL} title="Newsletter sign-up" width="100%" height="320" frameborder="0" scrolling="no" style="border:0;max-width:100%" loading="lazy"></iframe>
+  {BEEHIIV_FORM_ID ? (
+    <div>
+      <script async src="https://subscribe-forms.beehiiv.com/v3/loader.js" data-beehiiv-form={BEEHIIV_FORM_ID}></script>
+      <noscript><p><a href={BEEHIIV_EMBED_URL}>Subscribe on beehiiv</a></p></noscript>
+      <p class="meta">Prefer a page? <a href={BEEHIIV_EMBED_URL} rel="noopener">Subscribe on beehiiv</a>. One email when the rules change, unsubscribe any time.</p>
+    </div>
   ) : (
     <div class="todo">
-      <p><strong>TODO (site owner):</strong> newsletter sign-up goes here. Set <code>BEEHIIV_EMBED_URL</code> in <code>site.config.mjs</code> to your beehiiv embed URL and rebuild. Until then no sign-up form is shown and no email is collected.</p>
+      <p><strong>TODO (site owner):</strong> newsletter sign-up goes here. Set <code>BEEHIIV_FORM_ID</code> in <code>site.config.mjs</code>. Until then no sign-up form is shown and no email is collected.</p>
     </div>
   )}
 
