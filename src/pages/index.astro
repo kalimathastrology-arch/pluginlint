@@ -54,7 +54,7 @@ const latest = (history.entries as { date: string; title: string; summary: strin
   <h2 id="newsletter">Get an email when the rules change</h2>
   {BEEHIIV_FORM_ID ? (
     <div>
-      <script async src="https://subscribe-forms.beehiiv.com/v3/loader.js" data-beehiiv-form={BEEHIIV_FORM_ID}></script>
+      <iframe src={`https://subscribe-forms.beehiiv.com/v3/forms/${BEEHIIV_FORM_ID}`} title="Newsletter sign-up" width="100%" height="330" frameborder="0" scrolling="no" style="border:0;max-width:100%;width:100%" loading="lazy"></iframe>
       <noscript><p><a href={BEEHIIV_EMBED_URL}>Subscribe on beehiiv</a></p></noscript>
       <p class="meta">Prefer a page? <a href={BEEHIIV_EMBED_URL} rel="noopener">Subscribe on beehiiv</a>. One email when the rules change, unsubscribe any time.</p>
     </div>
