@@ -17,7 +17,7 @@ Quality and reliability
 Plugins must behave predictably and reliably. Results should be accurate and relevant to user input. Errors, including unexpected ones, must be handled with clear messaging or fallback behaviors.
 Plugins should be stable, responsive, and complete. Trial or demo plugins will not be accepted.
 Plugin name, description, and prompts
-Plugin names and descriptions must be clear, accurate, and straightforward. Screenshots are no longer shown in the Directory, instead provide example Prompts that help users get started with your plugin.
+Plugin names and descriptions must be clear, accurate, and straightforward. Provide example prompts that help users get started with your plugin.
 - Names: Avoid overly generic names, especially single-word dictionary terms that aren’t explicitly tied to your brand. Do not append “MCP,” “MCP Server,” or “Plugin” to a company or product name.
 - Subtitles and descriptions: Describe the plugin’s functionality without comparing it with other products, disparaging alternatives, or making unverifiable claims. Do not advertise pricing, subscriptions, free trials, discounts, or promotions.
 Safety

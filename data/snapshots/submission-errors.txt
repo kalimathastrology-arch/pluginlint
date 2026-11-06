@@ -55,9 +55,6 @@ and a successful, current tool scan.
 - Explicit readOnlyHint, openWorldHint, and destructiveHint values and a
 justification for each value on every MCP tool.
 - Reviewer-ready demo credentials when the server uses OAuth.
-- Screenshots only when the MCP server provides custom UI. If you add
-screenshots, provide one PNG or JPEG image for every starter prompt. Each
-screenshot must be exactly 706 pixels wide and 400–860 pixels tall.
 Final metadata errors
 In these error names, subtitle means short description and description
 means long description.
@@ -107,8 +104,6 @@ domain_verification_required |
 The exact verification token must be hosted at the generated /.well-known/openai-apps-challenge URL on the MCP host or an allowed parent host, and Verify Domain must pass. |
 frame_domain_explanation_required |
 Every external frame domain reported by the MCP tool scan must have an explanation of why the UI needs it and what content it provides. |
-screenshots_not_allowed |
-Screenshots are allowed only when the current MCP tool scan reports a UI output template. |
 Archive errors
 ZIP upload errors and warnings
 The portal’s Skills only path accepts skill ZIP packages and
@@ -125,8 +120,6 @@ mcp_configuration_excluded |
 MCP configuration is excluded unless your organization is approved for local MCP submissions. For a local MCP plugin, ask your OpenAI representative to confirm the submitting organization is allowlisted. Submit remote MCP servers through With MCP. |
 app_configuration_excluded |
 ZIP uploads must not include apps or .app.json. Submit remote MCP servers through With MCP; for local MCP servers, follow the desktop-only submission instructions. |
-screenshot_configuration_excluded |
-Skills-only ZIP uploads must not include interface.screenshots; screenshots require With MCP and custom UI. |
 claude_format_normalized |
 .claude-plugin/plugin.json is converted to .codex-plugin/plugin.json, with missing interface defaults and normalized text fields added by the portal. |
 manifest_normalized |
@@ -606,8 +599,7 @@ declared_asset_not_regular_file |
 The named asset field must reference a file, not a directory or special file. |
 Image errors
 Directory branding images must use a supported file type and meet the size and
-dimension limits below. These rules apply to packaged branding assets;
-starter-prompt screenshots use the separate portal limits listed above.
+dimension limits below. These rules apply to packaged branding assets.
 Name |
 Requirement |
 plugin_logo_path_missing |

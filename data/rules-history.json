@@ -4,17 +4,75 @@
     "submission-errors": {
       "title": "Plugin submission errors",
       "url": "https://developers.openai.com/plugins/deploy/submission-errors",
-      "hash": "d15c779fe23a26f6e012b4fc73de11ba4ac2f16e6aaf6620b113d9b7776a12f6",
-      "lastChanged": "2026-10-26"
+      "hash": "cfe502a2864b41d025a963be2980d545c5b1a8468988466a849917109adead55",
+      "lastChanged": "2026-11-06"
     },
     "plugin-guidelines": {
       "title": "Plugin guidelines",
       "url": "https://developers.openai.com/plugins/plugin-guidelines",
-      "hash": "741095eb35cf86291149920fbad53f24eb1a5cadc58cb582f025f9031e929188",
-      "lastChanged": "2026-10-26"
+      "hash": "1ea9f9f53b5bab7c9565d63eb5f8ddfac38f867beb84d38f1e30f893c5dd44e1",
+      "lastChanged": "2026-11-06"
     }
   },
   "entries": [
+    {
+      "date": "2026-11-06",
+      "page": "plugin-guidelines",
+      "title": "Plugin guidelines",
+      "url": "https://developers.openai.com/plugins/plugin-guidelines",
+      "type": "change",
+      "hash": "1ea9f9f53b5bab7c9565d63eb5f8ddfac38f867beb84d38f1e30f893c5dd44e1",
+      "prevHash": "741095eb35cf86291149920fbad53f24eb1a5cadc58cb582f025f9031e929188",
+      "summary": "“Plugin guidelines” changed: 1 line(s) added, 2 removed. Review the limits on PluginLint’s rules page.",
+      "diff": {
+        "addedCount": 1,
+        "removedCount": 2,
+        "added": [
+          "Plugin names and descriptions must be clear, accurate, and straightforward. Provide example prompts that help users get started with your plugin."
+        ],
+        "removed": [
+          "Plugin names and descriptions must be clear, accurate, and straightforward. Screenshots are no longer shown in the Directory, instead provide example Prompts that help users get started with your plugin.",
+          ""
+        ],
+        "numbersAdded": [],
+        "numbersRemoved": []
+      }
+    },
+    {
+      "date": "2026-11-06",
+      "page": "submission-errors",
+      "title": "Plugin submission errors",
+      "url": "https://developers.openai.com/plugins/deploy/submission-errors",
+      "type": "change",
+      "hash": "cfe502a2864b41d025a963be2980d545c5b1a8468988466a849917109adead55",
+      "prevHash": "d15c779fe23a26f6e012b4fc73de11ba4ac2f16e6aaf6620b113d9b7776a12f6",
+      "summary": "“Plugin submission errors” changed: 1 line(s) added, 10 removed; numbers added: —; numbers removed: 706, 400, 860. Review the limits on PluginLint’s rules page.",
+      "diff": {
+        "addedCount": 1,
+        "removedCount": 10,
+        "added": [
+          "dimension limits below. These rules apply to packaged branding assets."
+        ],
+        "removed": [
+          "- Screenshots only when the MCP server provides custom UI. If you add",
+          "screenshots, provide one PNG or JPEG image for every starter prompt. Each",
+          "screenshot must be exactly 706 pixels wide and 400–860 pixels tall.",
+          "screenshots_not_allowed |",
+          "Screenshots are allowed only when the current MCP tool scan reports a UI output template. |",
+          "screenshot_configuration_excluded |",
+          "Skills-only ZIP uploads must not include interface.screenshots; screenshots require With MCP and custom UI. |",
+          "dimension limits below. These rules apply to packaged branding assets;",
+          "starter-prompt screenshots use the separate portal limits listed above.",
+          ""
+        ],
+        "numbersAdded": [],
+        "numbersRemoved": [
+          "706",
+          "400",
+          "860"
+        ]
+      }
+    },
     {
       "date": "2026-10-26",
       "page": "plugin-guidelines",
@@ -34,5 +92,5 @@
       "summary": "Started tracking “Plugin submission errors” (703 lines of text)."
     }
   ],
-  "updated": "2026-10-26"
+  "updated": "2026-11-06"
 }
